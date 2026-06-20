@@ -18,10 +18,13 @@ export const mockIssues: Issue[] = [
     images: ['https://picsum.photos/id/1033/600/800'],
     marks: [[]],
     rectifyImages: [],
+    responsibleTeam: '张班组（通风分包）',
+    planDeadline: '2026-06-18',
+    source: 'manual',
     records: [
       {
         id: 'r001',
-        time: '2024-06-18 09:30',
+        time: '2026-06-16 09:30',
         operator: '张工（施工员）',
         role: 'worker',
         action: '提交问题',
@@ -30,8 +33,8 @@ export const mockIssues: Issue[] = [
       }
     ],
     creator: '张工',
-    createTime: '2024-06-18 09:30',
-    updateTime: '2024-06-18 09:30'
+    createTime: '2026-06-16 09:30',
+    updateTime: '2026-06-16 09:30'
   },
   {
     id: 'i002',
@@ -47,10 +50,13 @@ export const mockIssues: Issue[] = [
     rectifyImages: ['https://picsum.photos/id/1035/600/800'],
     rectifyMethod: 'hanger_adjust',
     rectifyDescription: '支吊架下调50mm，增加检修空间',
+    responsibleTeam: '王班组（水电分包）',
+    planDeadline: '2026-06-22',
+    source: 'manual',
     records: [
       {
         id: 'r002',
-        time: '2024-06-17 14:20',
+        time: '2026-06-17 14:20',
         operator: '李工（施工员）',
         role: 'worker',
         action: '提交问题',
@@ -59,7 +65,7 @@ export const mockIssues: Issue[] = [
       },
       {
         id: 'r003',
-        time: '2024-06-19 10:15',
+        time: '2026-06-19 10:15',
         operator: '王班组（水电分包）',
         role: 'worker',
         action: '提交整改',
@@ -69,8 +75,8 @@ export const mockIssues: Issue[] = [
       }
     ],
     creator: '李工',
-    createTime: '2024-06-17 14:20',
-    updateTime: '2024-06-19 10:15'
+    createTime: '2026-06-17 14:20',
+    updateTime: '2026-06-19 10:15'
   },
   {
     id: 'i003',
@@ -91,19 +97,23 @@ export const mockIssues: Issue[] = [
     rectifyImages: ['https://picsum.photos/id/1037/600/800'],
     rectifyMethod: 'pipe_move',
     rectifyDescription: '调整喷淋支管高度至设计标高',
+    responsibleTeam: '陈班组（消防分包）',
+    planDeadline: '2026-06-17',
+    source: 'elevation',
+    sourceRecordId: 'e003',
     records: [
       {
         id: 'r004',
-        time: '2024-06-15 08:45',
+        time: '2026-06-15 08:45',
         operator: '赵工（施工员）',
         role: 'worker',
-        action: '提交问题',
-        description: '喷淋管标高偏差50mm，超出允许范围',
+        action: '标高核对转待整改',
+        description: '由标高核对记录生成。设计标高 4.5m，实测标高 4.55m，偏差 50mm，超出允许偏差 20mm。备注：喷淋管偏高50mm',
         images: []
       },
       {
         id: 'r005',
-        time: '2024-06-16 16:30',
+        time: '2026-06-16 16:30',
         operator: '陈班组（消防分包）',
         role: 'worker',
         action: '提交整改',
@@ -113,7 +123,7 @@ export const mockIssues: Issue[] = [
       },
       {
         id: 'r006',
-        time: '2024-06-17 09:00',
+        time: '2026-06-17 09:00',
         operator: '刘工（质检员）',
         role: 'inspector',
         action: '复查通过',
@@ -123,8 +133,8 @@ export const mockIssues: Issue[] = [
       }
     ],
     creator: '赵工',
-    createTime: '2024-06-15 08:45',
-    updateTime: '2024-06-17 09:00'
+    createTime: '2026-06-15 08:45',
+    updateTime: '2026-06-17 09:00'
   },
   {
     id: 'i004',
@@ -140,10 +150,13 @@ export const mockIssues: Issue[] = [
     rectifyImages: ['https://picsum.photos/id/1039/600/800'],
     rectifyMethod: 'other',
     rectifyDescription: '已调整风管位置',
+    responsibleTeam: '周班组（通风分包）',
+    planDeadline: '2026-06-20',
+    source: 'manual',
     records: [
       {
         id: 'r007',
-        time: '2024-06-14 11:00',
+        time: '2026-06-14 11:00',
         operator: '孙工（施工员）',
         role: 'worker',
         action: '提交问题',
@@ -152,7 +165,7 @@ export const mockIssues: Issue[] = [
       },
       {
         id: 'r008',
-        time: '2024-06-18 15:20',
+        time: '2026-06-18 15:20',
         operator: '周班组（通风分包）',
         role: 'worker',
         action: '提交整改',
@@ -162,18 +175,19 @@ export const mockIssues: Issue[] = [
       },
       {
         id: 'r009',
-        time: '2024-06-19 08:30',
+        time: '2026-06-19 08:30',
         operator: '刘工（质检员）',
         role: 'inspector',
         action: '复查退回',
         description: '检修空间仍然不足，需重新调整',
         images: [],
-        result: 'reject'
+        result: 'reject',
+        rejectReason: '调整后间距仍不足150mm的检修最小空间，风管需再向外侧平移至少50mm。同时注意与消防喷淋管保持安全距离。'
       }
     ],
     creator: '孙工',
-    createTime: '2024-06-14 11:00',
-    updateTime: '2024-06-19 08:30'
+    createTime: '2026-06-14 11:00',
+    updateTime: '2026-06-19 08:30'
   },
   {
     id: 'i005',
@@ -187,10 +201,13 @@ export const mockIssues: Issue[] = [
     images: ['https://picsum.photos/id/1040/600/800'],
     marks: [[]],
     rectifyImages: [],
+    responsibleTeam: '设计组',
+    planDeadline: '2026-06-25',
+    source: 'manual',
     records: [
       {
         id: 'r010',
-        time: '2024-06-16 13:45',
+        time: '2026-06-16 13:45',
         operator: '吴工（施工员）',
         role: 'worker',
         action: '提交问题',
@@ -199,7 +216,7 @@ export const mockIssues: Issue[] = [
       },
       {
         id: 'r011',
-        time: '2024-06-18 10:00',
+        time: '2026-06-18 10:00',
         operator: '郑工（质检员）',
         role: 'inspector',
         action: '提交设计确认',
@@ -209,8 +226,8 @@ export const mockIssues: Issue[] = [
       }
     ],
     creator: '吴工',
-    createTime: '2024-06-16 13:45',
-    updateTime: '2024-06-18 10:00'
+    createTime: '2026-06-16 13:45',
+    updateTime: '2026-06-18 10:00'
   },
   {
     id: 'i006',
@@ -224,10 +241,13 @@ export const mockIssues: Issue[] = [
     images: ['https://picsum.photos/id/1041/600/800'],
     marks: [[]],
     rectifyImages: [],
+    responsibleTeam: '未分配',
+    planDeadline: '2026-06-23',
+    source: 'manual',
     records: [
       {
         id: 'r012',
-        time: '2024-06-19 11:20',
+        time: '2026-06-19 11:20',
         operator: '张工（施工员）',
         role: 'worker',
         action: '提交问题',
@@ -236,8 +256,8 @@ export const mockIssues: Issue[] = [
       }
     ],
     creator: '张工',
-    createTime: '2024-06-19 11:20',
-    updateTime: '2024-06-19 11:20'
+    createTime: '2026-06-19 11:20',
+    updateTime: '2026-06-19 11:20'
   },
   {
     id: 'i007',
@@ -253,10 +273,13 @@ export const mockIssues: Issue[] = [
     rectifyImages: ['https://picsum.photos/id/1043/600/800'],
     rectifyMethod: 'insulation_adjust',
     rectifyDescription: '已调整保温层厚度至设计要求',
+    responsibleTeam: '马班组（通风分包）',
+    planDeadline: '2026-06-17',
+    source: 'manual',
     records: [
       {
         id: 'r013',
-        time: '2024-06-13 16:00',
+        time: '2026-06-13 16:00',
         operator: '钱工（施工员）',
         role: 'worker',
         action: '提交问题',
@@ -265,7 +288,7 @@ export const mockIssues: Issue[] = [
       },
       {
         id: 'r014',
-        time: '2024-06-20 09:45',
+        time: '2026-06-20 09:45',
         operator: '马班组（通风分包）',
         role: 'worker',
         action: '提交整改',
@@ -275,8 +298,8 @@ export const mockIssues: Issue[] = [
       }
     ],
     creator: '钱工',
-    createTime: '2024-06-13 16:00',
-    updateTime: '2024-06-20 09:45'
+    createTime: '2026-06-13 16:00',
+    updateTime: '2026-06-20 09:45'
   }
 ];
 
@@ -293,8 +316,9 @@ export const mockElevationRecords: ElevationRecord[] = [
     deviation: 150,
     isQualified: false,
     remark: '风管偏低150mm，需调整',
-    createTime: '2024-06-18 09:30',
-    images: []
+    createTime: '2026-06-18 09:30',
+    images: [],
+    isConverted: false
   },
   {
     id: 'e002',
@@ -308,8 +332,9 @@ export const mockElevationRecords: ElevationRecord[] = [
     deviation: 10,
     isQualified: true,
     remark: '符合要求',
-    createTime: '2024-06-18 09:45',
-    images: []
+    createTime: '2026-06-18 09:45',
+    images: [],
+    isConverted: false
   },
   {
     id: 'e003',
@@ -323,8 +348,10 @@ export const mockElevationRecords: ElevationRecord[] = [
     deviation: 50,
     isQualified: false,
     remark: '喷淋管偏高50mm',
-    createTime: '2024-06-15 08:45',
-    images: []
+    createTime: '2026-06-15 08:45',
+    images: [],
+    isConverted: true,
+    convertedIssueId: 'i003'
   },
   {
     id: 'e004',
@@ -338,8 +365,9 @@ export const mockElevationRecords: ElevationRecord[] = [
     deviation: 10,
     isQualified: true,
     remark: '偏差在允许范围内',
-    createTime: '2024-06-15 09:10',
-    images: []
+    createTime: '2026-06-15 09:10',
+    images: [],
+    isConverted: false
   },
   {
     id: 'e005',
@@ -353,7 +381,8 @@ export const mockElevationRecords: ElevationRecord[] = [
     deviation: 30,
     isQualified: false,
     remark: '桥架偏低30mm',
-    createTime: '2024-06-16 13:45',
-    images: []
+    createTime: '2026-06-16 13:45',
+    images: [],
+    isConverted: false
   }
 ];

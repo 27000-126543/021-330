@@ -248,3 +248,84 @@
     box-shadow: none;
   }
 }
+
+.rejectNotice {
+  margin: $spacing-md;
+  background: rgba($color-error, 0.06);
+  border: 2rpx solid rgba($color-error, 0.2);
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.rejectNoticeHeader {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  background: rgba($color-error, 0.1);
+  border-bottom: 1rpx solid rgba($color-error, 0.15);
+}
+
+.rejectNoticeIcon {
+  font-size: $font-size-lg;
+  margin-right: $spacing-sm;
+  line-height: 1;
+}
+
+.rejectNoticeTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-error;
+}
+
+.rejectNoticeBody {
+  padding: $spacing-md $spacing-lg;
+}
+
+.rejectNoticeLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-error;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.rejectNoticeText {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  line-height: 1.6;
+  display: block;
+  margin-bottom: $spacing-md;
+}
+
+.rejectNoticePhotos {
+  margin-bottom: $spacing-md;
+}
+
+.rejectNoticePhotosLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-error;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.rejectNoticePhotoList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+}
+
+.rejectNoticePhoto {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-xs;
+  display: block;
+}
+
+.rejectNoticeTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  display: block;
+  padding-top: $spacing-sm;
+  border-top: 1rpx solid rgba($color-error, 0.1);
+}

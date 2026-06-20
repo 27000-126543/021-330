@@ -2,58 +2,100 @@
 
 .card {
   background: $color-bg-card;
-  border-radius: $radius-md;
-  box-shadow: $shadow-card;
-  padding: $spacing-lg;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
   margin-bottom: $spacing-md;
-  transition: all $transition-base;
+  box-shadow: $shadow-card;
+  position: relative;
+  overflow: hidden;
+  transition: all $transition-fast;
 
   &:active {
-    transform: scale(0.99);
-    box-shadow: $shadow-card-hover;
+    transform: scale(0.98);
   }
+
+  &.overdue {
+    border: 2rpx solid $color-error;
+    background: linear-gradient(to right, rgba(245, 63, 63, 0.05), transparent 20%);
+  }
+}
+
+.overdueBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: $color-error;
+  padding: 4rpx $spacing-sm;
+  border-bottom-left-radius: $radius-sm;
+  z-index: 2;
+}
+
+.overdueText {
+  font-size: $font-size-xs;
+  color: #fff;
+  font-weight: $font-weight-semibold;
+  line-height: 1.2;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $spacing-md;
+  margin-bottom: $spacing-sm;
 }
 
 .left {
   display: flex;
   align-items: center;
-  flex: 1;
-  min-width: 0;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
 }
 
 .typeTag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 40rpx;
-  padding: 0 $spacing-sm;
+  display: inline-block;
+  padding: 4rpx $spacing-sm;
   background: $color-primary-bg;
   color: $color-primary;
-  font-size: $font-size-sm;
+  font-size: $font-size-xs;
+  border-radius: $radius-xs;
   font-weight: $font-weight-medium;
-  border-radius: $radius-sm;
-  margin-right: $spacing-sm;
-  flex-shrink: 0;
+}
+
+.categoryTag {
+  display: inline-block;
+  padding: 4rpx $spacing-sm;
+  background: $color-info-bg;
+  color: $color-info;
+  font-size: $font-size-xs;
+  border-radius: $radius-xs;
+  font-weight: $font-weight-medium;
+}
+
+.sourceTag {
+  display: inline-block;
+  padding: 4rpx $spacing-sm;
+  background: $color-warning-bg;
+  border-radius: $radius-xs;
+}
+
+.sourceTagText {
+  font-size: $font-size-xs;
+  color: $color-warning;
+  font-weight: $font-weight-medium;
 }
 
 .axis {
-  font-size: $font-size-sm;
-  color: $color-text-secondary;
-  @include text-ellipsis;
-  flex: 1;
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
 }
 
 .content {
   display: flex;
-  gap: $spacing-md;
-  margin-bottom: $spacing-md;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
 }
 
 .imageWrapper {
@@ -90,42 +132,32 @@
 
 .info {
   flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-}
-
-.category {
-  font-size: $font-size-md;
-  font-weight: $font-weight-semibold;
-  color: $color-text-primary;
-  margin-bottom: $spacing-xs;
-  @include text-ellipsis;
+  gap: $spacing-xs;
+  min-width: 0;
 }
 
 .description {
   font-size: $font-size-sm;
   color: $color-text-secondary;
-  line-height: 1.5;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .elevationRow {
   display: flex;
-  gap: $spacing-sm;
-  margin-top: $spacing-sm;
+  gap: $spacing-xs;
+  margin-top: auto;
 }
 
 .elevationItem {
   flex: 1;
   text-align: center;
   background: $color-bg-page;
-  border-radius: $radius-sm;
+  border-radius: $radius-xs;
   padding: $spacing-xs 0;
 }
 
@@ -133,10 +165,11 @@
   display: block;
   font-size: $font-size-xs;
   color: $color-text-tertiary;
-  margin-bottom: 4rpx;
+  margin-bottom: 2rpx;
 }
 
 .elevValue {
+  display: block;
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
@@ -173,20 +206,57 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: $spacing-md;
-  border-top: 1rpx solid $color-divider;
+  padding-top: $spacing-sm;
+  border-top: 1rpx dashed $color-border-light;
+  margin-bottom: $spacing-xs;
+}
+
+.footerLeft {
+  flex: 1;
+  min-width: 0;
+}
+
+.teamText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.footerRight {
+  flex-shrink: 0;
+  margin-left: $spacing-sm;
+}
+
+.deadlineText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+
+  &.deadlineOverdue {
+    color: $color-error;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.footerSecondary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .projectName {
-  font-size: $font-size-sm;
+  font-size: $font-size-xs;
   color: $color-text-tertiary;
-  @include text-ellipsis;
   flex: 1;
-  margin-right: $spacing-md;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .time {
   font-size: $font-size-xs;
   color: $color-text-tertiary;
   flex-shrink: 0;
+  margin-left: $spacing-sm;
 }

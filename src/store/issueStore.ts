@@ -16,6 +16,7 @@ interface AppState {
   addIssue: (issue: Issue) => void;
   updateIssue: (issue: Issue) => void;
   addElevationRecord: (record: ElevationRecord) => void;
+  updateElevationRecord: (id: string, record: Partial<ElevationRecord>) => void;
   getIssuesByStatus: (status: string) => Issue[];
   getIssueById: (id: string) => Issue | undefined;
 }
@@ -75,6 +76,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ elevationRecords: records });
     storage.setSync(STORAGE_KEYS.ELEVATION_RECORDS, records);
     console.log('[Store] addElevationRecord:', record.id);
+  },
+
+  updateElevationRecord: (id: string, updates: Partial<ElevationRecord>) => {
+    const records = get().elevationRecords.map(r =>
+      r.id === id ? { ...r, ...updates } : r
+    );
+    set({ elevationRecords: records });
+    storage.setSync(STORAGE_KEYS.ELEVATION_RECORDS, records);
+    console.log('[Store] updateElevationRecord:', id);
   },
 
   getIssuesByStatus: (status: string) => {

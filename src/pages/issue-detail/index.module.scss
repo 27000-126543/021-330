@@ -432,3 +432,198 @@
   font-size: $font-size-sm;
   color: rgba(255, 255, 255, 0.6);
 }
+
+.rejectReasonBox {
+  background: rgba($color-error, 0.08);
+  border-left: 4rpx solid $color-error;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-xs;
+  margin: $spacing-sm 0;
+}
+
+.rejectReasonLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-error;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.rejectReasonText {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  line-height: 1.5;
+}
+
+.rejectModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $page-padding;
+}
+
+.rejectModalContent {
+  width: 100%;
+  max-height: 80vh;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rejectModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+  flex-shrink: 0;
+}
+
+.rejectModalTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.rejectModalClose {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  padding: $spacing-xs;
+  line-height: 1;
+}
+
+.rejectModalBody {
+  flex: 1;
+  padding: $spacing-lg;
+  max-height: 60vh;
+}
+
+.rejectFormItem {
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.rejectFormLabel {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.rejectTextarea {
+  width: 100%;
+  height: 200rpx;
+  background: $color-bg-input;
+  border-radius: $radius-sm;
+  padding: $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+
+.rejectPhotoPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.rejectPhotoItem {
+  position: relative;
+  width: calc(33.333% - #{$spacing-sm} * 2 / 3);
+  aspect-ratio: 1;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.rejectPhotoImg {
+  width: 100%;
+  height: 100%;
+}
+
+.rejectPhotoDelete {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 28rpx;
+  line-height: 1;
+}
+
+.rejectPhotoAdd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 160rpx;
+  border: 2rpx dashed $color-border;
+  border-radius: $radius-sm;
+  background: $color-bg-input;
+}
+
+.rejectPhotoAddIcon {
+  font-size: 40rpx;
+  color: $color-text-tertiary;
+  line-height: 1;
+  margin-bottom: $spacing-xs;
+}
+
+.rejectPhotoAddText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.rejectModalFooter {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  border-top: 1rpx solid $color-divider;
+  flex-shrink: 0;
+}
+
+.rejectBtnCancel {
+  flex: 1;
+  height: 80rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  background: $color-bg-page;
+  color: $color-text-secondary;
+}
+
+.rejectBtnConfirm {
+  flex: 1;
+  height: 80rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  background: $color-error;
+  color: #fff;
+}

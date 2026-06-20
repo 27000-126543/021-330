@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, Image, ScrollView } from '@tarojs/components';
+import { View, Text, Image, ScrollView, Textarea } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
 import styles from './index.module.scss';
@@ -31,6 +31,9 @@ const IssueDetailPage: React.FC = () => {
   const [issue, setIssue] = useState<Issue | null>(null);
   const [viewingImage, setViewingImage] = useState<string | null>(null);
   const [viewingImageMarks, setViewingImageMarks] = useState<IssueMark[]>([]);
+  const [rejectModalVisible, setRejectModalVisible] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectImages, setRejectImages] = useState<string[]>([]);
 
   const issueId = router.params.id;
 
@@ -92,41 +95,69 @@ const IssueDetailPage: React.FC = () => {
 
   const handleReviewReject = useCallback(() => {
     if (!issue) return;
-    Taro.showModal({
-      title: '确认退回',
-      content: '确认退回该问题，要求重新整改？',
-      success: (res) => {
-        if (res.confirm) {
-          const now = new Date();
-          const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    setRejectReason('');
+    setRejectImages([]);
+    setRejectModalVisible(true);
+  }, [issue]);
 
-          const newRecord: RectifyRecord = {
-            id: `r${Date.now()}`,
-            time: timeStr,
-            operator: currentUser,
-            role: 'inspector',
-            action: '复查退回',
-            description: '整改不合格，需重新整改',
-            images: [],
-            result: 'reject'
-          };
+  const handleRejectCancel = useCallback(() => {
+    setRejectModalVisible(false);
+    setRejectReason('');
+    setRejectImages([]);
+  }, []);
 
-          const updatedIssue: Issue = {
-            ...issue,
-            status: 'rejected',
-            records: [...issue.records, newRecord],
-            updateTime: timeStr
-          };
+  const handleAddRejectImage = useCallback(() => {
+    if (rejectImages.length >= 6) {
+      Taro.showToast({ title: '最多上传6张照片', icon: 'none' });
+      return;
+    }
+    const randomId = Math.floor(Math.random() * 1000);
+    const newImage = `https://picsum.photos/400/300?random=${Date.now()}_${randomId}`;
+    setRejectImages(prev => [...prev, newImage]);
+  }, [rejectImages.length]);
 
-          updateIssue(updatedIssue);
-          setIssue(updatedIssue);
-          console.log('[IssueDetail] review reject:', issue.id);
+  const handleDeleteRejectImage = useCallback((index: number) => {
+    setRejectImages(prev => prev.filter((_, i) => i !== index));
+  }, []);
 
-          Taro.showToast({ title: '已退回', icon: 'none' });
-        }
-      }
-    });
-  }, [issue, updateIssue, currentUser]);
+  const handleRejectConfirm = useCallback(() => {
+    if (!issue) return;
+    if (!rejectReason.trim()) {
+      Taro.showToast({ title: '请填写退回原因', icon: 'none' });
+      return;
+    }
+
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const newRecord: RectifyRecord = {
+      id: `r${Date.now()}`,
+      time: timeStr,
+      operator: currentUser,
+      role: 'inspector',
+      action: '复查退回',
+      description: '整改不合格，需重新整改',
+      images: rejectImages,
+      result: 'reject',
+      rejectReason: rejectReason.trim()
+    };
+
+    const updatedIssue: Issue = {
+      ...issue,
+      status: 'rejected',
+      records: [...issue.records, newRecord],
+      updateTime: timeStr
+    };
+
+    updateIssue(updatedIssue);
+    setIssue(updatedIssue);
+    setRejectModalVisible(false);
+    setRejectReason('');
+    setRejectImages([]);
+    console.log('[IssueDetail] review reject:', issue.id);
+
+    Taro.showToast({ title: '已退回', icon: 'none' });
+  }, [issue, rejectReason, rejectImages, updateIssue, currentUser]);
 
   const handleDesignConfirm = useCallback(() => {
     if (!issue) return;
@@ -379,6 +410,12 @@ const IssueDetailPage: React.FC = () => {
                       <Text className={styles.timelineTime}>{record.time}</Text>
                     </View>
                     <Text className={styles.timelineOperator}>{record.operator} · {record.role === 'inspector' ? '质检员' : record.role === 'worker' ? '施工员' : '管理员'}</Text>
+                    {record.rejectReason && (
+                      <View className={styles.rejectReasonBox}>
+                        <Text className={styles.rejectReasonLabel}>退回原因：</Text>
+                        <Text className={styles.rejectReasonText}>{record.rejectReason}</Text>
+                      </View>
+                    )}
                     {record.description && (
                       <Text className={styles.timelineDesc}>{record.description}</Text>
                     )}
@@ -426,6 +463,61 @@ const IssueDetailPage: React.FC = () => {
               </View>
             </>
           )}
+        </View>
+      )}
+
+      {rejectModalVisible && (
+        <View className={styles.rejectModal} onClick={handleRejectCancel}>
+          <View className={styles.rejectModalContent} onClick={e => e.stopPropagation()}>
+            <View className={styles.rejectModalHeader}>
+              <Text className={styles.rejectModalTitle}>复查退回</Text>
+              <Text className={styles.rejectModalClose} onClick={handleRejectCancel}>✕</Text>
+            </View>
+            <ScrollView scrollY className={styles.rejectModalBody}>
+              <View className={styles.rejectFormItem}>
+                <Text className={styles.rejectFormLabel}>退回原因</Text>
+                <Textarea
+                  className={styles.rejectTextarea}
+                  placeholder="请详细描述退回原因，便于施工班组整改..."
+                  placeholderClass="placeholder"
+                  value={rejectReason}
+                  onInput={(e) => setRejectReason(e.detail.value)}
+                  maxlength={500}
+                />
+              </View>
+              <View className={styles.rejectFormItem}>
+                <Text className={styles.rejectFormLabel}>复查照片</Text>
+                {rejectImages.length > 0 && (
+                  <View className={styles.rejectPhotoPreview}>
+                    {rejectImages.map((img, index) => (
+                      <View key={index} className={styles.rejectPhotoItem}>
+                        <Image className={styles.rejectPhotoImg} src={img} mode="aspectFill" />
+                        <View className={styles.rejectPhotoDelete} onClick={() => handleDeleteRejectImage(index)}>
+                          <Text>×</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                <View
+                  className={styles.rejectPhotoAdd}
+                  onClick={handleAddRejectImage}
+                  style={{ marginTop: rejectImages.length > 0 ? '24rpx' : 0 }}
+                >
+                  <Text className={styles.rejectPhotoAddIcon}>+</Text>
+                  <Text className={styles.rejectPhotoAddText}>添加照片</Text>
+                </View>
+              </View>
+            </ScrollView>
+            <View className={styles.rejectModalFooter}>
+              <View className={styles.rejectBtnCancel} onClick={handleRejectCancel}>
+                <Text>取消</Text>
+              </View>
+              <View className={styles.rejectBtnConfirm} onClick={handleRejectConfirm}>
+                <Text>确认退回</Text>
+              </View>
+            </View>
+          </View>
         </View>
       )}
 

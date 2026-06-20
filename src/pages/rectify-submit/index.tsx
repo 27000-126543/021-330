@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, Image, Textarea, ScrollView } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
@@ -17,6 +17,12 @@ const RectifySubmitPage: React.FC = () => {
   const [images, setImages] = useState<string[]>([]);
 
   const issueId = router.params.id;
+
+  const lastRejectRecord = useMemo(() => {
+    if (!issue) return null;
+    const rejectRecords = issue.records.filter(r => r.action === '复查退回' && r.rejectReason);
+    return rejectRecords.length > 0 ? rejectRecords[rejectRecords.length - 1] : null;
+  }, [issue]);
 
   useEffect(() => {
     if (issueId) {
@@ -120,6 +126,39 @@ const RectifySubmitPage: React.FC = () => {
           <Text className={styles.issueMeta}>项目：{issue.projectName}</Text>
           <Text className={styles.issueMeta}>问题：{issue.description}</Text>
         </View>
+
+        {issue.status === 'rejected' && lastRejectRecord && (
+          <View className={styles.rejectNotice}>
+            <View className={styles.rejectNoticeHeader}>
+              <Text className={styles.rejectNoticeIcon}>⚠️</Text>
+              <Text className={styles.rejectNoticeTitle}>上次退回意见</Text>
+            </View>
+            <View className={styles.rejectNoticeBody}>
+              <Text className={styles.rejectNoticeLabel}>退回原因：</Text>
+              <Text className={styles.rejectNoticeText}>{lastRejectRecord.rejectReason}</Text>
+              {lastRejectRecord.images.length > 0 && (
+                <View className={styles.rejectNoticePhotos}>
+                  <Text className={styles.rejectNoticePhotosLabel}>退回照片：</Text>
+                  <View className={styles.rejectNoticePhotoList}>
+                    {lastRejectRecord.images.map((img, idx) => (
+                      <Image
+                        key={idx}
+                        className={styles.rejectNoticePhoto}
+                        src={img}
+                        mode="aspectFill"
+                        onClick={() => Taro.previewImage({
+                          current: img,
+                          urls: lastRejectRecord.images
+                        })}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+              <Text className={styles.rejectNoticeTime}>退回时间：{lastRejectRecord.time}</Text>
+            </View>
+          </View>
+        )}
 
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>整改方式</Text>

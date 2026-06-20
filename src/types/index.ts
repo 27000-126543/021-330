@@ -31,12 +31,13 @@ export interface RectifyRecord {
   id: string;
   time: string;
   operator: string;
-  role: 'worker' | 'inspector';
+  role: 'worker' | 'inspector' | 'designer';
   action: string;
   description: string;
   images: string[];
   method?: RectifyMethod;
   result?: 'pass' | 'reject' | 'design';
+  rejectReason?: string;
 }
 
 export interface Issue {
@@ -58,6 +59,10 @@ export interface Issue {
   rectifyImages: string[];
   rectifyMethod?: RectifyMethod;
   rectifyDescription?: string;
+  responsibleTeam?: string;
+  planDeadline?: string;
+  source: 'manual' | 'elevation';
+  sourceRecordId?: string;
   records: RectifyRecord[];
   creator: string;
   createTime: string;
@@ -78,6 +83,8 @@ export interface ElevationRecord {
   remark: string;
   createTime: string;
   images: string[];
+  isConverted: boolean;
+  convertedIssueId?: string;
 }
 
 export const IssueTypeText: Record<IssueType, string> = {

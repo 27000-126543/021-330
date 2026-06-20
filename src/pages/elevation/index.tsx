@@ -8,7 +8,7 @@ import { ElevationRecord, IssueType, IssueTypeText, Issue, RectifyRecord } from 
 import EmptyState from '@/components/EmptyState';
 
 const ElevationPage: React.FC = () => {
-  const { elevationRecords, addElevationRecord, addIssue, currentProject, currentUser } = useAppStore();
+  const { elevationRecords, addElevationRecord, addIssue, updateElevationRecord, currentProject, currentUser } = useAppStore();
 
   const [filterType, setFilterType] = useState<string>('all');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -101,7 +101,8 @@ const ElevationPage: React.FC = () => {
       isQualified: qualified,
       remark: remark.trim(),
       createTime: timeStr,
-      images: []
+      images: [],
+      isConverted: false
     };
 
     addElevationRecord(record);
@@ -119,6 +120,11 @@ const ElevationPage: React.FC = () => {
   }, [currentProject, axisPosition, designElevation, measuredElevation, allowableDeviation, recordType, remark, addElevationRecord]);
 
   const handleConvertToIssue = useCallback((record: ElevationRecord) => {
+    if (record.isConverted) {
+      Taro.showToast({ title: '该记录已转待整改', icon: 'none' });
+      return;
+    }
+
     Taro.showModal({
       title: '转待整改问题',
       content: `确定将 ${record.axisPosition} 的不合格标高记录转为待整改问题吗？`,
@@ -144,6 +150,8 @@ const ElevationPage: React.FC = () => {
             images: record.images || [],
             marks: (record.images || []).map(() => []),
             rectifyImages: [],
+            source: 'elevation',
+            sourceRecordId: record.id,
             records: [
               {
                 id: `r${Date.now()}`,
@@ -161,21 +169,21 @@ const ElevationPage: React.FC = () => {
           };
 
           addIssue(newIssue);
-          console.log('[Elevation] converted to issue:', newIssue.id);
+          updateElevationRecord(record.id, {
+            isConverted: true,
+            convertedIssueId: newIssue.id
+          });
+          console.log('[Elevation] converted to issue:', newIssue.id, 'from record:', record.id);
 
           Taro.showToast({
             title: '已生成待整改问题',
             icon: 'success',
             duration: 1500
           });
-
-          setTimeout(() => {
-            Taro.switchTab({ url: '/pages/rectification/index' });
-          }, 1500);
         }
       }
     });
-  }, [addIssue, currentUser]);
+  }, [addIssue, updateElevationRecord, currentUser]);
 
   const handleSelectProject = () => {
     Taro.navigateTo({ url: '/pages/project-select/index' });
@@ -266,12 +274,28 @@ const ElevationPage: React.FC = () => {
 
               <View className={styles.cardFooter}>
                 <Text className={styles.timeText}>{record.createTime}</Text>
-                {!record.isQualified && (
+                {record.isConverted ? (
+                  <View
+                    className={styles.viewIssueBtn}
+                    onClick={() => {
+                      if (record.convertedIssueId) {
+                        Taro.navigateTo({ url: `/pages/issue-detail/index?id=${record.convertedIssueId}` });
+                      }
+                    }}
+                  >
+                    <Text className={styles.viewIssueBtnText}>查看问题</Text>
+                  </View>
+                ) : !record.isQualified ? (
                   <View className={styles.convertBtn} onClick={() => handleConvertToIssue(record)}>
                     <Text className={styles.convertBtnText}>转待整改</Text>
                   </View>
-                )}
+                ) : null}
               </View>
+              {record.isConverted && (
+                <View className={styles.convertedTag}>
+                  <Text className={styles.convertedTagText}>✓ 已转待整改</Text>
+                </View>
+              )}
             </View>
           ))
         )}

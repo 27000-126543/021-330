@@ -4,7 +4,7 @@ import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 import { useAppStore } from '@/store/issueStore';
-import { IssueStatus, IssueType, IssueTypeText } from '@/types';
+import { IssueStatus, IssueCategory, IssueCategoryText } from '@/types';
 import IssueCard from '@/components/IssueCard';
 import EmptyState from '@/components/EmptyState';
 
@@ -12,31 +12,73 @@ const statusTabs = [
   { key: 'all', label: '全部' },
   { key: 'pending', label: '待整改' },
   { key: 'processing', label: '整改中' },
-  { key: 'done', label: '已通过' },
-  { key: 'rejected', label: '已退回' }
+  { key: 'rejected', label: '已退回' },
+  { key: 'design', label: '设计确认' },
+  { key: 'done', label: '已通过' }
 ];
 
-const typeOptions: { key: IssueType | 'all'; label: string }[] = [
-  { key: 'all', label: '全部类型' },
-  { key: 'duct', label: IssueTypeText.duct },
-  { key: 'bridge', label: IssueTypeText.bridge },
-  { key: 'sprinkler', label: IssueTypeText.sprinkler },
-  { key: 'cable', label: IssueTypeText.cable }
+const categoryOptions: { key: IssueCategory | 'all'; label: string }[] = [
+  { key: 'all', label: '全部类别' },
+  { key: 'deviation', label: IssueCategoryText.deviation },
+  { key: 'close_beam', label: IssueCategoryText.close_beam },
+  { key: 'insufficient_space', label: IssueCategoryText.insufficient_space },
+  { key: 'elevation', label: IssueCategoryText.elevation },
+  { key: 'other', label: IssueCategoryText.other }
 ];
 
-const deviationOptions = [
+const timeFilterOptions = [
   { key: 'all', label: '全部' },
-  { key: 'unqualified', label: '超标不合格' },
-  { key: 'qualified', label: '合格' }
+  { key: 'overdue', label: '已逾期' },
+  { key: 'today', label: '今日到期' },
+  { key: 'week', label: '本周到期' }
 ];
+
+const sourceOptions = [
+  { key: 'all', label: '全部来源' },
+  { key: 'manual', label: '现场录入' },
+  { key: 'elevation', label: '标高转入' }
+];
+
+const isOverdue = (planDeadline?: string, status?: string): boolean => {
+  if (!planDeadline) return false;
+  if (status === 'done') return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadline = new Date(planDeadline);
+  deadline.setHours(0, 0, 0, 0);
+  return deadline < today;
+};
+
+const isToday = (planDeadline?: string): boolean => {
+  if (!planDeadline) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadline = new Date(planDeadline);
+  deadline.setHours(0, 0, 0, 0);
+  return deadline.getTime() === today.getTime();
+};
+
+const isThisWeek = (planDeadline?: string): boolean => {
+  if (!planDeadline) return false;
+  const today = new Date();
+  const deadline = new Date(planDeadline);
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay());
+  weekStart.setHours(0, 0, 0, 0);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
+  return deadline >= weekStart && deadline <= weekEnd;
+};
 
 const RectificationPage: React.FC = () => {
   const { issues, projects } = useAppStore();
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchText, setSearchText] = useState('');
   const [selectedProject, setSelectedProject] = useState<string>('all');
-  const [selectedType, setSelectedType] = useState<string>('all');
-  const [selectedDeviation, setSelectedDeviation] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedTimeFilter, setSelectedTimeFilter] = useState<string>('all');
+  const [selectedSource, setSelectedSource] = useState<string>('all');
   const [showFilterPanel, setShowFilterPanel] = useState(false);
 
   const stats = useMemo(() => {
@@ -44,19 +86,20 @@ const RectificationPage: React.FC = () => {
       all: issues.length,
       pending: issues.filter(i => i.status === 'pending').length,
       processing: issues.filter(i => i.status === 'processing').length,
-      done: issues.filter(i => i.status === 'done').length,
       rejected: issues.filter(i => i.status === 'rejected').length,
-      design: issues.filter(i => i.status === 'design').length
+      design: issues.filter(i => i.status === 'design').length,
+      done: issues.filter(i => i.status === 'done').length
     };
   }, [issues]);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (selectedProject !== 'all') count++;
-    if (selectedType !== 'all') count++;
-    if (selectedDeviation !== 'all') count++;
+    if (selectedCategory !== 'all') count++;
+    if (selectedTimeFilter !== 'all') count++;
+    if (selectedSource !== 'all') count++;
     return count;
-  }, [selectedProject, selectedType, selectedDeviation]);
+  }, [selectedProject, selectedCategory, selectedTimeFilter, selectedSource]);
 
   const filteredIssues = useMemo(() => {
     let result = [...issues];
@@ -69,33 +112,48 @@ const RectificationPage: React.FC = () => {
       result = result.filter(i => i.projectId === selectedProject);
     }
 
-    if (selectedType !== 'all') {
-      result = result.filter(i => i.type === selectedType);
+    if (selectedCategory !== 'all') {
+      result = result.filter(i => i.category === selectedCategory);
     }
 
-    if (selectedDeviation !== 'all') {
-      if (selectedDeviation === 'unqualified') {
-        result = result.filter(i => i.isQualified === false);
-      } else if (selectedDeviation === 'qualified') {
-        result = result.filter(i => i.isQualified === true);
-      }
+    if (selectedSource !== 'all') {
+      result = result.filter(i => i.source === selectedSource);
+    }
+
+    if (selectedTimeFilter !== 'all') {
+      result = result.filter(i => {
+        if (selectedTimeFilter === 'overdue') {
+          return isOverdue(i.planDeadline, i.status);
+        } else if (selectedTimeFilter === 'today') {
+          return isToday(i.planDeadline);
+        } else if (selectedTimeFilter === 'week') {
+          return isThisWeek(i.planDeadline);
+        }
+        return true;
+      });
     }
 
     if (searchText.trim()) {
       const keyword = searchText.trim().toLowerCase();
       result = result.filter(i =>
         i.axisPosition.toLowerCase().includes(keyword) ||
-        i.description.toLowerCase().includes(keyword)
+        i.description.toLowerCase().includes(keyword) ||
+        (i.responsibleTeam && i.responsibleTeam.toLowerCase().includes(keyword))
       );
     }
 
     return result;
-  }, [issues, activeTab, selectedProject, selectedType, selectedDeviation, searchText]);
+  }, [issues, activeTab, selectedProject, selectedCategory, selectedTimeFilter, selectedSource, searchText]);
+
+  const overdueCount = useMemo(() => {
+    return issues.filter(i => isOverdue(i.planDeadline, i.status)).length;
+  }, [issues]);
 
   const handleResetFilters = () => {
     setSelectedProject('all');
-    setSelectedType('all');
-    setSelectedDeviation('all');
+    setSelectedCategory('all');
+    setSelectedTimeFilter('all');
+    setSelectedSource('all');
     setSearchText('');
     setShowFilterPanel(false);
     Taro.showToast({ title: '已重置筛选', icon: 'none' });
@@ -113,7 +171,7 @@ const RectificationPage: React.FC = () => {
             <Text className={styles.searchIcon}>🔍</Text>
             <Input
               className={styles.searchInput}
-              placeholder="搜索轴线位置或问题描述"
+              placeholder="搜索轴线、描述、责任班组"
               value={searchText}
               onInput={(e) => setSearchText(e.detail.value)}
               confirmType="search"
@@ -176,13 +234,13 @@ const RectificationPage: React.FC = () => {
           </View>
 
           <View className={styles.filterSection}>
-            <Text className={styles.filterLabel}>问题类型</Text>
+            <Text className={styles.filterLabel}>问题类别</Text>
             <View className={styles.filterGrid}>
-              {typeOptions.map(opt => (
+              {categoryOptions.map(opt => (
                 <View
                   key={opt.key}
-                  className={classnames(styles.filterOption, selectedType === opt.key && styles.optionActive)}
-                  onClick={() => setSelectedType(opt.key)}
+                  className={classnames(styles.filterOption, selectedCategory === opt.key && styles.optionActive)}
+                  onClick={() => setSelectedCategory(opt.key)}
                 >
                   <Text>{opt.label}</Text>
                 </View>
@@ -191,13 +249,28 @@ const RectificationPage: React.FC = () => {
           </View>
 
           <View className={styles.filterSection}>
-            <Text className={styles.filterLabel}>标高偏差</Text>
+            <Text className={styles.filterLabel}>时间筛选</Text>
             <View className={styles.filterGrid}>
-              {deviationOptions.map(opt => (
+              {timeFilterOptions.map(opt => (
                 <View
                   key={opt.key}
-                  className={classnames(styles.filterOption, selectedDeviation === opt.key && styles.optionActive)}
-                  onClick={() => setSelectedDeviation(opt.key)}
+                  className={classnames(styles.filterOption, selectedTimeFilter === opt.key && styles.optionActive)}
+                  onClick={() => setSelectedTimeFilter(opt.key)}
+                >
+                  <Text>{opt.label}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          <View className={styles.filterSection}>
+            <Text className={styles.filterLabel}>问题来源</Text>
+            <View className={styles.filterGrid}>
+              {sourceOptions.map(opt => (
+                <View
+                  key={opt.key}
+                  className={classnames(styles.filterOption, selectedSource === opt.key && styles.optionActive)}
+                  onClick={() => setSelectedSource(opt.key)}
                 >
                   <Text>{opt.label}</Text>
                 </View>
@@ -216,7 +289,18 @@ const RectificationPage: React.FC = () => {
         </View>
       )}
 
-      {activeFilterCount > 0 && !showFilterPanel && (
+      {overdueCount > 0 && activeTab === 'all' && !showFilterPanel && (
+        <View className={styles.overdueAlert} onClick={() => { setSelectedTimeFilter('overdue'); setActiveTab('all'); }}>
+          <View className={styles.overdueAlertIcon}>⚠️</View>
+          <View className={styles.overdueAlertText}>
+            <Text className={styles.overdueAlertTitle}>有 {overdueCount} 条问题已逾期</Text>
+            <Text className={styles.overdueAlertDesc}>请优先处理超期整改项</Text>
+          </View>
+          <Text className={styles.overdueAlertArrow}>›</Text>
+        </View>
+      )}
+
+      {(activeFilterCount > 0 || searchText) && !showFilterPanel && (
         <View className={styles.activeFiltersBar}>
           <Text className={styles.filterResultText}>
             共找到 {filteredIssues.length} 条结果
