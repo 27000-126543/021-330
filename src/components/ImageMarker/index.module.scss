@@ -1,0 +1,181 @@
+@use '@/styles/variables.scss' as *;
+
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+  background: rgba(0, 0, 0, 0.8);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: #fff;
+}
+
+.headerActions {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.headerBtn {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: $font-size-sm;
+
+  &:active {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+.canvasWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md;
+  min-height: 300rpx;
+}
+
+.loading {
+  color: #888;
+  font-size: $font-size-md;
+}
+
+.canvasBox {
+  position: relative;
+  background: #222;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.toolbar {
+  background: rgba(0, 0, 0, 0.8);
+  padding: $spacing-md $spacing-lg;
+  flex-shrink: 0;
+}
+
+.toolSection {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.toolLabel {
+  display: block;
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: $spacing-sm;
+}
+
+.tools {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.toolBtn {
+  flex: 1;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: $radius-sm;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: $font-size-sm;
+  transition: all $transition-fast;
+
+  &.active {
+    background: $color-primary;
+    color: #fff;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.colors {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+}
+
+.colorBtn {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  border: 4rpx solid transparent;
+  transition: all $transition-fast;
+  box-sizing: border-box;
+
+  &.colorActive {
+    border-color: #fff;
+    transform: scale(1.15);
+  }
+}
+
+.footer {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  background: rgba(0, 0, 0, 0.9);
+  flex-shrink: 0;
+}
+
+.cancelBtn,
+.saveBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.cancelBtn {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.saveBtn {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(22, 93, 255, 0.4);
+}

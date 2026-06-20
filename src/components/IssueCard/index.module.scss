@@ -56,12 +56,36 @@
   margin-bottom: $spacing-md;
 }
 
-.image {
+.imageWrapper {
+  position: relative;
   width: 180rpx;
   height: 180rpx;
   border-radius: $radius-sm;
   flex-shrink: 0;
   background: $color-bg-hover;
+  overflow: hidden;
+}
+
+.markIndicator {
+  position: absolute;
+  top: 8rpx;
+  left: 8rpx;
+  min-width: 40rpx;
+  height: 40rpx;
+  padding: 0 $spacing-xs;
+  background: $color-primary;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.markIndicatorText {
+  font-size: $font-size-xs;
+  color: #fff;
+  font-weight: $font-weight-semibold;
+  line-height: 1;
 }
 
 .info {
@@ -122,6 +146,27 @@
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
   color: $color-error;
+
+  &.elevPass {
+    color: $color-success;
+  }
+}
+
+.elevStatus {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  padding: 2rpx $spacing-xs;
+  border-radius: $radius-xs;
+
+  &.statusPass {
+    color: $color-success;
+    background: $color-success-bg;
+  }
+
+  &.statusFail {
+    color: $color-error;
+    background: $color-error-bg;
+  }
 }
 
 .footer {

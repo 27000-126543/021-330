@@ -283,3 +283,49 @@
   color: $color-text-tertiary;
   text-align: center;
 }
+
+.markBadge {
+  position: absolute;
+  top: 8rpx;
+  left: 8rpx;
+  min-width: 40rpx;
+  height: 40rpx;
+  padding: 0 $spacing-xs;
+  background: $color-primary;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.markBadgeText {
+  font-size: $font-size-xs;
+  color: #fff;
+  font-weight: $font-weight-semibold;
+  line-height: 1;
+}
+
+.markBtn {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48rpx;
+  background: rgba(22, 93, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: all $transition-fast;
+
+  &:active {
+    background: $color-primary-dark;
+  }
+}
+
+.markBtnText {
+  font-size: $font-size-xs;
+  color: #fff;
+  font-weight: $font-weight-medium;
+}

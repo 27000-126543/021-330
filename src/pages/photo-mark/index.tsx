@@ -4,7 +4,8 @@ import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 import { useAppStore } from '@/store/issueStore';
-import { IssueType, IssueCategory, IssueTypeText, IssueCategoryText, Issue } from '@/types';
+import { IssueType, IssueCategory, IssueTypeText, IssueCategoryText, Issue, IssueMark } from '@/types';
+import ImageMarker from '@/components/ImageMarker';
 
 const PhotoMarkPage: React.FC = () => {
   const { currentProject, addIssue, currentUser } = useAppStore();
@@ -17,8 +18,10 @@ const PhotoMarkPage: React.FC = () => {
   const [measuredElevation, setMeasuredElevation] = useState('');
   const [allowableDeviation, setAllowableDeviation] = useState('20');
   const [images, setImages] = useState<string[]>([]);
+  const [imageMarks, setImageMarks] = useState<IssueMark[][]>([]);
   const [deviation, setDeviation] = useState<number | null>(null);
   const [isQualified, setIsQualified] = useState<boolean | null>(null);
+  const [markingImageIndex, setMarkingImageIndex] = useState<number | null>(null);
 
   const issueTypes: IssueType[] = ['duct', 'bridge', 'sprinkler', 'other'];
   const categories: IssueCategory[] = ['deviation', 'close_beam', 'insufficient_space', 'elevation', 'other'];
@@ -47,6 +50,7 @@ const PhotoMarkPage: React.FC = () => {
       success: (res) => {
         const newImages = res.tempFilePaths;
         setImages(prev => [...prev, ...newImages]);
+        setImageMarks(prev => [...prev, ...newImages.map(() => [])]);
         console.log('[PhotoMark] chooseImage success:', newImages.length);
       },
       fail: (err) => {
@@ -58,11 +62,97 @@ const PhotoMarkPage: React.FC = () => {
 
   const handleDeleteImage = useCallback((index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
+    setImageMarks(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const handleStartMark = useCallback((index: number) => {
+    setMarkingImageIndex(index);
+  }, []);
+
+  const handleSaveMarks = useCallback((marks: IssueMark[]) => {
+    if (markingImageIndex !== null) {
+      Taro.getImageInfo({
+        src: images[markingImageIndex],
+        success: (imgRes) => {
+          const scaledMarks = marks.map(mark => ({
+            ...mark,
+            points: mark.points.map(p => ({
+              x: (p.x / imgRes.width) * 100,
+              y: (p.y / imgRes.height) * 100
+            }))
+          }));
+
+          setImageMarks(prev => {
+            const updated = [...prev];
+            updated[markingImageIndex] = scaledMarks;
+            return updated;
+          });
+          console.log('[PhotoMark] marks saved for image', markingImageIndex, ':', scaledMarks.length);
+
+          Taro.showToast({
+            title: `已保存${scaledMarks.length}处标注`,
+            icon: 'success',
+            duration: 1000
+          });
+        },
+        fail: () => {
+          setImageMarks(prev => {
+            const updated = [...prev];
+            updated[markingImageIndex] = marks;
+            return updated;
+          });
+        }
+      });
+    }
+    setMarkingImageIndex(null);
+  }, [markingImageIndex, images]);
+
+  const handleCancelMark = useCallback(() => {
+    setMarkingImageIndex(null);
   }, []);
 
   const handleSelectProject = () => {
     Taro.navigateTo({ url: '/pages/project-select/index' });
   };
+
+  const validateElevationData = useCallback(() => {
+    const hasElevationInput = designElevation.trim() !== '' || measuredElevation.trim() !== '' || allowableDeviation.trim() !== '';
+    const hasElevationCategory = category === 'elevation';
+
+    if (hasElevationCategory || hasElevationInput) {
+      if (!designElevation.trim()) {
+        Taro.showToast({ title: '请填写设计标高', icon: 'none' });
+        return false;
+      }
+      if (!measuredElevation.trim()) {
+        Taro.showToast({ title: '请填写实测标高', icon: 'none' });
+        return false;
+      }
+      if (!allowableDeviation.trim()) {
+        Taro.showToast({ title: '请填写允许偏差', icon: 'none' });
+        return false;
+      }
+
+      const design = parseFloat(designElevation);
+      const measured = parseFloat(measuredElevation);
+      const allow = parseFloat(allowableDeviation);
+
+      if (isNaN(design)) {
+        Taro.showToast({ title: '设计标高格式不正确', icon: 'none' });
+        return false;
+      }
+      if (isNaN(measured)) {
+        Taro.showToast({ title: '实测标高格式不正确', icon: 'none' });
+        return false;
+      }
+      if (isNaN(allow)) {
+        Taro.showToast({ title: '允许偏差格式不正确', icon: 'none' });
+        return false;
+      }
+    }
+
+    return true;
+  }, [designElevation, measuredElevation, allowableDeviation, category]);
 
   const handleSubmit = useCallback(() => {
     if (!currentProject) {
@@ -82,8 +172,24 @@ const PhotoMarkPage: React.FC = () => {
       return;
     }
 
+    if (!validateElevationData()) {
+      return;
+    }
+
     const now = new Date();
     const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const design = designElevation.trim() !== '' ? parseFloat(designElevation) : undefined;
+    const measured = measuredElevation.trim() !== '' ? parseFloat(measuredElevation) : undefined;
+    const allow = allowableDeviation.trim() !== '' ? parseFloat(allowableDeviation) : undefined;
+    const calculatedDeviation = design !== undefined && measured !== undefined
+      ? Math.round(Math.abs(measured - design) * 1000)
+      : undefined;
+    const calculatedQualified = calculatedDeviation !== undefined && allow !== undefined
+      ? calculatedDeviation <= allow
+      : undefined;
+
+    const allMarks = imageMarks.flat();
 
     const newIssue: Issue = {
       id: `i${Date.now()}`,
@@ -94,13 +200,13 @@ const PhotoMarkPage: React.FC = () => {
       category: category,
       description: description.trim(),
       status: 'pending',
-      designElevation: designElevation ? parseFloat(designElevation) : undefined,
-      measuredElevation: measuredElevation ? parseFloat(measuredElevation) : undefined,
-      allowableDeviation: allowableDeviation ? parseFloat(allowableDeviation) : undefined,
-      deviation: deviation ?? undefined,
-      isQualified: isQualified ?? undefined,
+      designElevation: design,
+      measuredElevation: measured,
+      allowableDeviation: allow,
+      deviation: calculatedDeviation,
+      isQualified: calculatedQualified,
       images: images,
-      marks: [],
+      marks: allMarks,
       rectifyImages: [],
       records: [
         {
@@ -119,7 +225,7 @@ const PhotoMarkPage: React.FC = () => {
     };
 
     addIssue(newIssue);
-    console.log('[PhotoMark] issue submitted:', newIssue.id);
+    console.log('[PhotoMark] issue submitted:', newIssue.id, 'marks:', allMarks.length);
 
     Taro.showToast({
       title: '提交成功',
@@ -133,10 +239,11 @@ const PhotoMarkPage: React.FC = () => {
       setDesignElevation('');
       setMeasuredElevation('');
       setImages([]);
+      setImageMarks([]);
       setDeviation(null);
       setIsQualified(null);
     }, 1500);
-  }, [currentProject, axisPosition, images, description, issueType, category, designElevation, measuredElevation, allowableDeviation, deviation, isQualified, addIssue, currentUser]);
+  }, [currentProject, axisPosition, images, imageMarks, description, issueType, category, designElevation, measuredElevation, allowableDeviation, validateElevationData, addIssue, currentUser]);
 
   return (
     <View className={styles.pageContainer}>
@@ -195,6 +302,11 @@ const PhotoMarkPage: React.FC = () => {
               </View>
             ))}
           </View>
+          {category === 'elevation' && (
+            <View style={{ marginTop: '16rpx', padding: '16rpx', background: '#e8f0ff', borderRadius: '8rpx' }}>
+              <Text style={{ fontSize: '24rpx', color: '#165dff' }}>选择了标高问题，请完整填写下方标高数据</Text>
+            </View>
+          )}
         </View>
 
         <View className={styles.formSection}>
@@ -202,15 +314,33 @@ const PhotoMarkPage: React.FC = () => {
           <View className={styles.photoArea} onClick={handleChooseImage}>
             <Text className={styles.photoIcon}>📷</Text>
             <Text className={styles.photoText}>点击拍照或从相册选择</Text>
-            <Text className={styles.markTip}>可在照片上圈注问题位置</Text>
+            <Text className={styles.markTip}>选完照片后可点击图片进入圈注模式</Text>
           </View>
           {images.length > 0 && (
             <View className={styles.photoPreview}>
               {images.map((img, index) => (
                 <View key={index} className={styles.photoItem}>
-                  <Image className={styles.photoImg} src={img} mode="aspectFill" />
-                  <View className={styles.photoDelete} onClick={() => handleDeleteImage(index)}>
+                  <Image
+                    className={styles.photoImg}
+                    src={img}
+                    mode="aspectFill"
+                    onClick={() => handleStartMark(index)}
+                  />
+                  {imageMarks[index] && imageMarks[index].length > 0 && (
+                    <View className={styles.markBadge}>
+                      <Text className={styles.markBadgeText}>{imageMarks[index].length}</Text>
+                    </View>
+                  )}
+                  <View className={styles.photoDelete} onClick={(e) => { e.stopPropagation(); handleDeleteImage(index); }}>
                     <Text>×</Text>
+                  </View>
+                  <View
+                    className={styles.markBtn}
+                    onClick={(e) => { e.stopPropagation(); handleStartMark(index); }}
+                  >
+                    <Text className={styles.markBtnText}>
+                      {imageMarks[index] && imageMarks[index].length > 0 ? '编辑标注' : '圈注'}
+                    </Text>
                   </View>
                 </View>
               ))}
@@ -255,6 +385,11 @@ const PhotoMarkPage: React.FC = () => {
               <Text className={styles.elevationUnit}>毫米 (mm)</Text>
             </View>
           </View>
+          {(designElevation || measuredElevation || allowableDeviation) && (
+            <View style={{ marginTop: '16rpx', fontSize: '22rpx', color: '#86909c' }}>
+              <Text>💡 提示：填写任一标高项后，三项均需完整填写才能提交</Text>
+            </View>
+          )}
           {deviation !== null && (
             <View className={classnames(styles.deviationResult, isQualified && styles.pass)}>
               <Text className={classnames(styles.deviationText, isQualified && styles.pass)}>
@@ -282,6 +417,15 @@ const PhotoMarkPage: React.FC = () => {
           <Text>提交问题</Text>
         </View>
       </View>
+
+      {markingImageIndex !== null && images[markingImageIndex] && (
+        <ImageMarker
+          imageUrl={images[markingImageIndex]}
+          initialMarks={imageMarks[markingImageIndex]}
+          onSave={handleSaveMarks}
+          onCancel={handleCancelMark}
+        />
+      )}
     </View>
   );
 };

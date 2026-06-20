@@ -4,6 +4,7 @@ import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 import { useAppStore } from '@/store/issueStore';
+import MarkedImageView from '@/components/MarkedImageView';
 import {
   Issue,
   IssueTypeText,
@@ -11,7 +12,8 @@ import {
   IssueStatusText,
   RectifyMethodText,
   RectifyRecord,
-  RectifyMethod
+  RectifyMethod,
+  IssueMark
 } from '@/types';
 
 const IssueDetailPage: React.FC = () => {
@@ -248,12 +250,25 @@ const IssueDetailPage: React.FC = () => {
           <Text className={styles.sectionTitle}>照片资料</Text>
 
           <View className={styles.photoGroup}>
-            <Text className={styles.photoLabel}>问题照片</Text>
+            <Text className={styles.photoLabel}>
+              问题照片
+              {issue.marks && issue.marks.length > 0 && (
+                <Text style={{ color: '#165dff', marginLeft: '8rpx' }}>
+                  (已标注 {issue.marks.length} 处问题)
+                </Text>
+              )}
+            </Text>
             {issue.images.length > 0 ? (
               <View className={styles.photoList}>
                 {issue.images.map((img, idx) => (
                   <View key={idx} className={styles.photoItem}>
-                    <Image className={styles.photoImg} src={img} mode="aspectFill" />
+                    <MarkedImageView
+                      imageUrl={img}
+                      marks={issue.marks || []}
+                      width={200}
+                      height={200}
+                      mode="aspectFill"
+                    />
                   </View>
                 ))}
               </View>

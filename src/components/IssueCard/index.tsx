@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, Image } from '@tarojs/components';
+import { View, Text } from '@tarojs/components';
 import Taro from '@tarojs/taro';
+import classnames from 'classnames';
 import styles from './index.module.scss';
 import StatusTag from '@/components/StatusTag';
+import MarkedImageView from '@/components/MarkedImageView';
 import { Issue, IssueTypeText, IssueCategoryText } from '@/types';
 
 interface IssueCardProps {
@@ -21,6 +23,10 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick }) => {
     }
   };
 
+  const hasElevationData = issue.designElevation !== undefined &&
+                          issue.measuredElevation !== undefined &&
+                          issue.allowableDeviation !== undefined;
+
   return (
     <View className={styles.card} onClick={handleClick}>
       <View className={styles.header}>
@@ -33,17 +39,26 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick }) => {
 
       <View className={styles.content}>
         {issue.images.length > 0 && (
-          <Image
-            className={styles.image}
-            src={issue.images[0]}
-            mode="aspectFill"
-          />
+          <View className={styles.imageWrapper}>
+            <MarkedImageView
+              imageUrl={issue.images[0]}
+              marks={issue.marks || []}
+              width={180}
+              height={180}
+              mode="aspectFill"
+            />
+            {issue.marks && issue.marks.length > 0 && (
+              <View className={styles.markIndicator}>
+                <Text className={styles.markIndicatorText}>{issue.marks.length}</Text>
+              </View>
+            )}
+          </View>
         )}
         <View className={styles.info}>
           <Text className={styles.category}>{IssueCategoryText[issue.category]}</Text>
           <Text className={styles.description}>{issue.description}</Text>
 
-          {issue.designElevation !== undefined && (
+          {hasElevationData && (
             <View className={styles.elevationRow}>
               <View className={styles.elevationItem}>
                 <Text className={styles.elevLabel}>设计</Text>
@@ -55,8 +70,14 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick }) => {
               </View>
               <View className={styles.elevationItem}>
                 <Text className={styles.elevLabel}>偏差</Text>
-                <Text className={styles.elevDeviation}>
+                <Text className={classnames(styles.elevDeviation, issue.isQualified && styles.elevPass)}>
                   {issue.deviation}mm
+                </Text>
+              </View>
+              <View className={styles.elevationItem}>
+                <Text className={styles.elevLabel}>状态</Text>
+                <Text className={classnames(styles.elevStatus, issue.isQualified ? styles.statusPass : styles.statusFail)}>
+                  {issue.isQualified ? '合格' : '不合格'}
                 </Text>
               </View>
             </View>
