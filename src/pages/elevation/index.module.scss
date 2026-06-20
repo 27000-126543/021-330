@@ -210,6 +210,23 @@
   color: $color-text-tertiary;
 }
 
+.convertBtn {
+  flex-shrink: 0;
+  height: 48rpx;
+  padding: 0 $spacing-sm;
+  background: $color-warning-bg;
+  border-radius: $radius-xs;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.convertBtnText {
+  font-size: $font-size-xs;
+  color: $color-warning;
+  font-weight: $font-weight-medium;
+}
+
 .fabButton {
   position: fixed;
   right: $page-padding;

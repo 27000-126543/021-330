@@ -3,67 +3,81 @@
 .pageContainer {
   min-height: 100vh;
   background: $color-bg-page;
-  padding-bottom: 180rpx;
+  padding-bottom: 0;
+  position: relative;
+}
+
+.scrollContainer {
+  height: calc(100vh - 180rpx);
 }
 
 .statusHeader {
-  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
-  padding: $spacing-lg $page-padding;
+  background: linear-gradient(135deg, $color-primary 0%, #4080ff 100%);
+  padding: $spacing-xl $page-padding;
+  padding-bottom: $spacing-lg * 2;
   color: #fff;
 }
 
 .statusRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: $spacing-sm;
 }
 
 .statusBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 44rpx;
-  padding: 0 $spacing-md;
-  border-radius: $radius-button;
-  background: rgba(255, 255, 255, 0.25);
+  display: inline-block;
+  padding: 8rpx $spacing-sm;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-sm;
   font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
+  color: #fff;
 }
 
 .issueTitle {
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
+  display: block;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: #fff;
   margin-bottom: $spacing-xs;
 }
 
 .issueSubtitle {
+  display: block;
   font-size: $font-size-sm;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .infoSection {
   background: $color-bg-card;
-  margin: $spacing-md 0;
-  padding: $spacing-lg;
+  margin: -$spacing-md $page-padding $spacing-md;
+  padding: $spacing-md;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+
+  &:first-of-type {
+    margin-top: -$spacing-xl;
+  }
 }
 
 .sectionTitle {
+  display: block;
   font-size: $font-size-md;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
   margin-bottom: $spacing-md;
-  display: flex;
-  align-items: center;
+  padding-left: $spacing-sm;
+  position: relative;
 
   &::before {
     content: '';
-    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
     width: 6rpx;
     height: 28rpx;
     background: $color-primary;
     border-radius: 3rpx;
-    margin-right: $spacing-sm;
   }
 }
 
@@ -74,29 +88,27 @@
 }
 
 .infoItem {
-  width: calc(50% - #{$spacing-md} / 2);
+  width: calc(50% - #{$spacing-sm});
 }
 
 .infoLabel {
   display: block;
-  font-size: $font-size-sm;
+  font-size: $font-size-xs;
   color: $color-text-tertiary;
-  margin-bottom: 6rpx;
+  margin-bottom: $spacing-xs;
 }
 
 .infoValue {
   display: block;
-  font-size: $font-size-md;
+  font-size: $font-size-sm;
   color: $color-text-primary;
   font-weight: $font-weight-medium;
-  word-break: break-all;
 }
 
 .elevationCard {
   background: $color-bg-page;
-  border-radius: $radius-sm;
+  border-radius: $radius-md;
   padding: $spacing-md;
-  margin-top: $spacing-md;
 }
 
 .elevRow {
@@ -112,41 +124,32 @@
 .elevCol {
   flex: 1;
   text-align: center;
-  background: $color-bg-card;
-  border-radius: $radius-sm;
-  padding: $spacing-sm 0;
 }
 
 .elevColLabel {
   display: block;
   font-size: $font-size-xs;
   color: $color-text-tertiary;
-  margin-bottom: 4rpx;
+  margin-bottom: $spacing-xs;
 }
 
 .elevColValue {
   display: block;
-  font-size: $font-size-md;
-  font-weight: $font-weight-semibold;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
   color: $color-text-primary;
 
   &.deviation {
     color: $color-error;
+  }
 
-    &.pass {
-      color: $color-success;
-    }
+  &.pass {
+    color: $color-success;
   }
 }
 
-.photoSection {
-  background: $color-bg-card;
-  margin: $spacing-md 0;
-  padding: $spacing-lg;
-}
-
 .photoGroup {
-  margin-bottom: $spacing-lg;
+  margin-bottom: $spacing-md;
 
   &:last-child {
     margin-bottom: 0;
@@ -156,9 +159,16 @@
 .photoLabel {
   display: block;
   font-size: $font-size-sm;
-  color: $color-text-secondary;
-  margin-bottom: $spacing-sm;
   font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.markCountText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  margin-left: $spacing-xs;
+  font-weight: $font-weight-normal;
 }
 
 .photoList {
@@ -168,118 +178,156 @@
 }
 
 .photoItem {
-  width: calc(33.333% - #{$spacing-sm} * 2 / 3);
-  aspect-ratio: 1;
-  border-radius: $radius-sm;
-  overflow: hidden;
-  background: $color-bg-page;
+  width: calc(33.33% - #{$spacing-xs});
+  position: relative;
 }
 
 .photoImg {
   width: 100%;
-  height: 100%;
+  height: 200rpx;
+  border-radius: $radius-sm;
+  display: block;
+}
+
+.photoIndex {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  text-align: center;
+  margin-top: $spacing-xs;
 }
 
 .emptyPhotos {
-  height: 120rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: $color-bg-page;
-  border-radius: $radius-sm;
+  padding: $spacing-lg 0;
+  text-align: center;
   color: $color-text-tertiary;
   font-size: $font-size-sm;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
 }
 
 .description {
-  font-size: $font-size-md;
-  color: $color-text-primary;
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
   line-height: 1.6;
+  background: $color-bg-page;
+  padding: $spacing-md;
+  border-radius: $radius-sm;
 }
 
-.recordList {
+.methodTag {
+  display: inline-block;
+  padding: $spacing-xs $spacing-sm;
+  background: $color-primary-bg;
+  color: $color-primary;
+  font-size: $font-size-sm;
+  border-radius: $radius-xs;
+  font-weight: $font-weight-medium;
+}
+
+.timelineList {
   position: relative;
-  padding-left: $spacing-lg;
+  padding-left: 60rpx;
 }
 
-.recordItem {
+.timelineItem {
   position: relative;
   padding-bottom: $spacing-lg;
 
   &:last-child {
     padding-bottom: 0;
   }
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: -$spacing-lg;
-    top: 8rpx;
-    width: 2rpx;
-    height: calc(100% - 16rpx);
-    background: $color-divider;
-  }
-
-  &:last-child::before {
-    display: none;
-  }
 }
 
-.recordDot {
+.timelineLine {
   position: absolute;
-  left: -$spacing-lg;
+  left: 14rpx;
   top: 0;
-  transform: translateX(calc(-50% + 1rpx));
-  width: 16rpx;
-  height: 16rpx;
-  border-radius: 50%;
-  background: $color-primary;
-  border: 4rpx solid $color-bg-card;
-  box-shadow: 0 0 0 2rpx $color-primary;
-  z-index: 1;
+  bottom: 0;
+  width: 4rpx;
+  background: $color-divider;
+
+  &.firstLine {
+    top: 20rpx;
+  }
 }
 
-.recordHeader {
+.timelineDot {
+  position: absolute;
+  left: -60rpx;
+  top: 0;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: $color-primary-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  border: 4rpx solid $color-bg-card;
+
+  &.dot_default {
+    background: $color-primary-bg;
+  }
+}
+
+.timelineIcon {
+  font-size: $font-size-md;
+  line-height: 1;
+}
+
+.timelineContent {
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+}
+
+.timelineHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: $spacing-xs;
 }
 
-.recordAction {
+.timelineAction {
   font-size: $font-size-md;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
 }
 
-.recordTime {
+.timelineTime {
   font-size: $font-size-xs;
   color: $color-text-tertiary;
 }
 
-.recordOperator {
+.timelineOperator {
   font-size: $font-size-sm;
   color: $color-text-secondary;
-  margin-bottom: $spacing-xs;
+  margin-bottom: $spacing-sm;
 }
 
-.recordDesc {
+.timelineDesc {
   font-size: $font-size-sm;
   color: $color-text-secondary;
   line-height: 1.5;
 }
 
-.recordPhotos {
+.timelinePhotos {
   display: flex;
   gap: $spacing-xs;
   margin-top: $spacing-sm;
 }
 
-.recordPhoto {
-  width: 100rpx;
-  height: 100rpx;
+.timelinePhoto {
+  width: 120rpx;
+  height: 120rpx;
   border-radius: $radius-xs;
-  overflow: hidden;
+  display: block;
+}
+
+.bottomSpace {
+  height: 120rpx;
 }
 
 .actionBar {
@@ -297,23 +345,23 @@
 }
 
 .actionBtn {
-  @include button-reset;
   flex: 1;
-  height: $button-height-lg;
-  border-radius: $radius-button;
+  height: 80rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: $font-size-md;
-  font-weight: $font-weight-semibold;
-  transition: all $transition-base;
-
-  &:active {
-    transform: scale(0.98);
-    opacity: 0.9;
-  }
+  font-weight: $font-weight-medium;
 
   &.primary {
-    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+    background: $color-primary;
     color: #fff;
-    box-shadow: 0 4rpx 16rpx rgba(22, 93, 255, 0.3);
+  }
+
+  &.secondary {
+    background: $color-warning-bg;
+    color: $color-warning;
   }
 
   &.success {
@@ -325,19 +373,62 @@
     background: $color-error;
     color: #fff;
   }
-
-  &.secondary {
-    background: $color-bg-page;
-    color: $color-text-secondary;
-  }
 }
 
-.methodTag {
-  display: inline-block;
-  padding: 4rpx $spacing-sm;
-  background: $color-primary-bg;
-  color: $color-primary;
-  font-size: $font-size-xs;
-  border-radius: $radius-xs;
-  margin-right: $spacing-xs;
+.imageViewer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.imageViewerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.imageViewerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $page-padding;
+  padding-top: calc(#{$spacing-md} + env(safe-area-inset-top));
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.imageViewerTitle {
+  font-size: $font-size-md;
+  color: #fff;
+  font-weight: $font-weight-semibold;
+}
+
+.imageViewerClose {
+  font-size: $font-size-lg;
+  color: #fff;
+  padding: $spacing-sm;
+}
+
+.imageViewerScroll {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageViewerFooter {
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.imageViewerHint {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.6);
 }

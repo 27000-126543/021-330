@@ -270,13 +270,13 @@ const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, i
       return;
     }
 
-    let markType: 'circle' | 'rect' | 'text' = 'freehand' as any;
+    let markType: IssueMark['type'] = 'freehand';
     if (currentTool === 'circle') {
       markType = 'circle';
     } else if (currentTool === 'rect') {
       markType = 'rect';
     } else if (currentTool === 'freehand') {
-      markType = 'circle';
+      markType = 'freehand';
     }
 
     const newMark: IssueMark = {

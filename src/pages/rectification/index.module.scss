@@ -15,6 +15,84 @@
   border-bottom: 1rpx solid $color-divider;
 }
 
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $page-padding;
+  border-bottom: 1rpx solid $color-border-light;
+}
+
+.searchBox {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 64rpx;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: 0 $spacing-md;
+  gap: $spacing-xs;
+}
+
+.searchIcon {
+  font-size: $font-size-md;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  height: 64rpx;
+}
+
+.searchClear {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  padding: $spacing-xs;
+  flex-shrink: 0;
+}
+
+.filterBtn {
+  flex-shrink: 0;
+  height: 64rpx;
+  padding: 0 $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  position: relative;
+
+  &.filterActive {
+    color: $color-primary;
+    background: $color-primary-bg;
+  }
+}
+
+.filterBadge {
+  position: absolute;
+  top: -6rpx;
+  right: -6rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  background: $color-error;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+}
+
+.filterBadgeText {
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: $font-weight-semibold;
+  line-height: 1;
+}
+
 .tabs {
   display: flex;
   padding: 0 $spacing-sm;
@@ -64,6 +142,113 @@
   height: 6rpx;
   background: $color-primary;
   border-radius: 3rpx;
+}
+
+.filterPanel {
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.filterSection {
+  margin-bottom: $spacing-md;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.filterLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.filterOptions {
+  display: flex;
+  white-space: nowrap;
+}
+
+.filterGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.filterOption {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+  transition: all $transition-fast;
+
+  &.optionActive {
+    background: $color-primary-bg;
+    color: $color-primary;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.filterActions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-border-light;
+}
+
+.resetBtn {
+  flex: 1;
+  height: 72rpx;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+}
+
+.applyBtn {
+  flex: 2;
+  height: 72rpx;
+  background: $color-primary;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  color: #fff;
+  font-weight: $font-weight-semibold;
+}
+
+.activeFiltersBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm $page-padding;
+  background: $color-primary-bg;
+}
+
+.filterResultText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.clearAllText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  text-decoration: underline;
 }
 
 .listContainer {

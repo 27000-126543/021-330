@@ -4,11 +4,11 @@ import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 import { useAppStore } from '@/store/issueStore';
-import { ElevationRecord, IssueType, IssueTypeText } from '@/types';
+import { ElevationRecord, IssueType, IssueTypeText, Issue, RectifyRecord } from '@/types';
 import EmptyState from '@/components/EmptyState';
 
 const ElevationPage: React.FC = () => {
-  const { elevationRecords, addElevationRecord, currentProject, currentUser } = useAppStore();
+  const { elevationRecords, addElevationRecord, addIssue, currentProject, currentUser } = useAppStore();
 
   const [filterType, setFilterType] = useState<string>('all');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -118,6 +118,65 @@ const ElevationPage: React.FC = () => {
     }, 1500);
   }, [currentProject, axisPosition, designElevation, measuredElevation, allowableDeviation, recordType, remark, addElevationRecord]);
 
+  const handleConvertToIssue = useCallback((record: ElevationRecord) => {
+    Taro.showModal({
+      title: '转待整改问题',
+      content: `确定将 ${record.axisPosition} 的不合格标高记录转为待整改问题吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          const now = new Date();
+          const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+          const newIssue: Issue = {
+            id: `i${Date.now()}`,
+            projectId: record.projectId,
+            projectName: record.projectName,
+            axisPosition: record.axisPosition,
+            type: record.type,
+            category: 'elevation',
+            description: `标高偏差 ${record.deviation}mm，超出允许偏差 ${record.allowableDeviation}mm。${record.remark ? '备注：' + record.remark : ''}`,
+            status: 'pending',
+            designElevation: record.designElevation,
+            measuredElevation: record.measuredElevation,
+            allowableDeviation: record.allowableDeviation,
+            deviation: record.deviation,
+            isQualified: false,
+            images: record.images || [],
+            marks: (record.images || []).map(() => []),
+            rectifyImages: [],
+            records: [
+              {
+                id: `r${Date.now()}`,
+                time: timeStr,
+                operator: currentUser,
+                role: 'inspector',
+                action: '标高核对转待整改',
+                description: `由标高核对记录生成。设计标高 ${record.designElevation}m，实测标高 ${record.measuredElevation}m，偏差 ${record.deviation}mm，超出允许偏差 ${record.allowableDeviation}mm。${record.remark ? '备注：' + record.remark : ''}`,
+                images: record.images || []
+              }
+            ],
+            creator: currentUser,
+            createTime: timeStr,
+            updateTime: timeStr
+          };
+
+          addIssue(newIssue);
+          console.log('[Elevation] converted to issue:', newIssue.id);
+
+          Taro.showToast({
+            title: '已生成待整改问题',
+            icon: 'success',
+            duration: 1500
+          });
+
+          setTimeout(() => {
+            Taro.switchTab({ url: '/pages/rectification/index' });
+          }, 1500);
+        }
+      }
+    });
+  }, [addIssue, currentUser]);
+
   const handleSelectProject = () => {
     Taro.navigateTo({ url: '/pages/project-select/index' });
   };
@@ -207,6 +266,11 @@ const ElevationPage: React.FC = () => {
 
               <View className={styles.cardFooter}>
                 <Text className={styles.timeText}>{record.createTime}</Text>
+                {!record.isQualified && (
+                  <View className={styles.convertBtn} onClick={() => handleConvertToIssue(record)}>
+                    <Text className={styles.convertBtnText}>转待整改</Text>
+                  </View>
+                )}
               </View>
             </View>
           ))

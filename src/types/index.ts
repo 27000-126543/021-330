@@ -21,7 +21,7 @@ export interface MarkPoint {
 
 export interface IssueMark {
   id: string;
-  type: 'circle' | 'rect' | 'text';
+  type: 'circle' | 'rect' | 'text' | 'freehand';
   points: MarkPoint[];
   color: string;
   text?: string;

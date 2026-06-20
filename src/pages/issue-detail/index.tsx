@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, Image, ScrollView } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
@@ -16,10 +16,21 @@ import {
   IssueMark
 } from '@/types';
 
+const timelineIconMap: Record<string, string> = {
+  '提交问题': '📝',
+  '提交整改': '🔧',
+  '复查通过': '✅',
+  '复查退回': '❌',
+  '提交设计确认': '📐',
+  '设计确认': '📐'
+};
+
 const IssueDetailPage: React.FC = () => {
   const router = useRouter();
   const { getIssueById, updateIssue, currentUser } = useAppStore();
   const [issue, setIssue] = useState<Issue | null>(null);
+  const [viewingImage, setViewingImage] = useState<string | null>(null);
+  const [viewingImageMarks, setViewingImageMarks] = useState<IssueMark[]>([]);
 
   const issueId = router.params.id;
 
@@ -155,6 +166,35 @@ const IssueDetailPage: React.FC = () => {
     });
   }, [issue, updateIssue, currentUser]);
 
+  const handlePreviewImage = useCallback((imageUrl: string, marks?: IssueMark[]) => {
+    if (marks && marks.length > 0) {
+      setViewingImage(imageUrl);
+      setViewingImageMarks(marks);
+    } else {
+      Taro.previewImage({
+        current: imageUrl,
+        urls: [imageUrl]
+      });
+    }
+  }, []);
+
+  const handlePreviewRecordPhotos = useCallback((images: string[], current: string) => {
+    Taro.previewImage({
+      current,
+      urls: images
+    });
+  }, []);
+
+  const closeImageViewer = useCallback(() => {
+    setViewingImage(null);
+    setViewingImageMarks([]);
+  }, []);
+
+  const totalMarks = useMemo(() => {
+    if (!issue) return 0;
+    return issue.marks ? issue.marks.flat().length : 0;
+  }, [issue]);
+
   if (!issue) {
     return (
       <View className={styles.pageContainer}>
@@ -179,7 +219,7 @@ const IssueDetailPage: React.FC = () => {
         <Text className={styles.issueSubtitle}>{issue.axisPosition}</Text>
       </View>
 
-      <ScrollView scrollY>
+      <ScrollView scrollY className={styles.scrollContainer}>
         <View className={styles.infoSection}>
           <Text className={styles.sectionTitle}>基本信息</Text>
           <View className={styles.infoGrid}>
@@ -248,15 +288,15 @@ const IssueDetailPage: React.FC = () => {
           </View>
         )}
 
-        <View className={styles.photoSection}>
+        <View className={styles.infoSection}>
           <Text className={styles.sectionTitle}>照片资料</Text>
 
           <View className={styles.photoGroup}>
             <Text className={styles.photoLabel}>
               问题照片
-              {issue.marks && issue.marks.flat().length > 0 && (
-                <Text style={{ color: '#165dff', marginLeft: '8rpx' }}>
-                  (已标注 {issue.marks.flat().length} 处问题)
+              {totalMarks > 0 && (
+                <Text className={styles.markCountText}>
+                  (已标注 {totalMarks} 处问题)
                 </Text>
               )}
             </Text>
@@ -270,7 +310,9 @@ const IssueDetailPage: React.FC = () => {
                       width={200}
                       height={200}
                       mode="aspectFill"
+                      onClick={() => handlePreviewImage(img, issue.marks[idx])}
                     />
+                    <Text className={styles.photoIndex}>第{idx + 1}张</Text>
                   </View>
                 ))}
               </View>
@@ -284,8 +326,13 @@ const IssueDetailPage: React.FC = () => {
               <Text className={styles.photoLabel}>整改后照片</Text>
               <View className={styles.photoList}>
                 {issue.rectifyImages.map((img, idx) => (
-                  <View key={idx} className={styles.photoItem}>
+                  <View
+                    key={idx}
+                    className={styles.photoItem}
+                    onClick={() => handlePreviewRecordPhotos(issue.rectifyImages, img)}
+                  >
                     <Image className={styles.photoImg} src={img} mode="aspectFill" />
+                    <Text className={styles.photoIndex}>第{idx + 1}张</Text>
                   </View>
                 ))}
               </View>
@@ -313,28 +360,49 @@ const IssueDetailPage: React.FC = () => {
         )}
 
         <View className={styles.infoSection}>
-          <Text className={styles.sectionTitle}>处理记录</Text>
-          <View className={styles.recordList}>
-            {issue.records.map(record => (
-              <View key={record.id} className={styles.recordItem}>
-                <View className={styles.recordDot} />
-                <View className={styles.recordHeader}>
-                  <Text className={styles.recordAction}>{record.action}</Text>
-                  <Text className={styles.recordTime}>{record.time}</Text>
-                </View>
-                <Text className={styles.recordOperator}>{record.operator}</Text>
-                <Text className={styles.recordDesc}>{record.description}</Text>
-                {record.images.length > 0 && (
-                  <View className={styles.recordPhotos}>
-                    {record.images.map((img, idx) => (
-                      <Image key={idx} className={styles.recordPhoto} src={img} mode="aspectFill" />
-                    ))}
+          <Text className={styles.sectionTitle}>处理时间线</Text>
+          <View className={styles.timelineList}>
+            {issue.records.map((record, idx) => {
+              const isFirst = idx === 0;
+              const isLast = idx === issue.records.length - 1;
+              const icon = timelineIconMap[record.action] || '📋';
+
+              return (
+                <View key={record.id} className={styles.timelineItem}>
+                  <View className={classnames(styles.timelineLine, isFirst && styles.firstLine)} />
+                  <View className={classnames(styles.timelineDot, styles[`dot_${record.action}`] || styles.dot_default)}>
+                    <Text className={styles.timelineIcon}>{icon}</Text>
                   </View>
-                )}
-              </View>
-            ))}
+                  <View className={styles.timelineContent}>
+                    <View className={styles.timelineHeader}>
+                      <Text className={styles.timelineAction}>{record.action}</Text>
+                      <Text className={styles.timelineTime}>{record.time}</Text>
+                    </View>
+                    <Text className={styles.timelineOperator}>{record.operator} · {record.role === 'inspector' ? '质检员' : record.role === 'worker' ? '施工员' : '管理员'}</Text>
+                    {record.description && (
+                      <Text className={styles.timelineDesc}>{record.description}</Text>
+                    )}
+                    {record.images.length > 0 && (
+                      <View className={styles.timelinePhotos}>
+                        {record.images.map((img, imgIdx) => (
+                          <Image
+                            key={imgIdx}
+                            className={styles.timelinePhoto}
+                            src={img}
+                            mode="aspectFill"
+                            onClick={() => handlePreviewRecordPhotos(record.images, img)}
+                          />
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                </View>
+              );
+            })}
           </View>
         </View>
+
+        <View className={styles.bottomSpace} />
       </ScrollView>
 
       {showActionBar && (
@@ -358,6 +426,29 @@ const IssueDetailPage: React.FC = () => {
               </View>
             </>
           )}
+        </View>
+      )}
+
+      {viewingImage && (
+        <View className={styles.imageViewer} onClick={closeImageViewer}>
+          <View className={styles.imageViewerContent} onClick={e => e.stopPropagation()}>
+            <View className={styles.imageViewerHeader}>
+              <Text className={styles.imageViewerTitle}>标注照片</Text>
+              <Text className={styles.imageViewerClose} onClick={closeImageViewer}>✕</Text>
+            </View>
+            <ScrollView scrollX scrollY className={styles.imageViewerScroll}>
+              <MarkedImageView
+                imageUrl={viewingImage}
+                marks={viewingImageMarks}
+                width={Taro.getSystemInfoSync().windowWidth}
+                height={Taro.getSystemInfoSync().windowHeight - 200}
+                mode="aspectFit"
+              />
+            </ScrollView>
+            <View className={styles.imageViewerFooter}>
+              <Text className={styles.imageViewerHint}>双指缩放查看 · 点击空白处关闭</Text>
+            </View>
+          </View>
         </View>
       )}
     </View>
