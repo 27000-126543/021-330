@@ -54,7 +54,7 @@ export interface Issue {
   deviation?: number;
   isQualified?: boolean;
   images: string[];
-  marks: IssueMark[];
+  marks: IssueMark[][];
   rectifyImages: string[];
   rectifyMethod?: RectifyMethod;
   rectifyDescription?: string;

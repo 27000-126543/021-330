@@ -210,7 +210,9 @@ const IssueDetailPage: React.FC = () => {
           </View>
         </View>
 
-        {issue.designElevation !== undefined && (
+        {issue.designElevation !== undefined &&
+         issue.measuredElevation !== undefined &&
+         issue.allowableDeviation !== undefined && (
           <View className={styles.infoSection}>
             <Text className={styles.sectionTitle}>标高信息</Text>
             <View className={styles.elevationCard}>
@@ -252,9 +254,9 @@ const IssueDetailPage: React.FC = () => {
           <View className={styles.photoGroup}>
             <Text className={styles.photoLabel}>
               问题照片
-              {issue.marks && issue.marks.length > 0 && (
+              {issue.marks && issue.marks.flat().length > 0 && (
                 <Text style={{ color: '#165dff', marginLeft: '8rpx' }}>
-                  (已标注 {issue.marks.length} 处问题)
+                  (已标注 {issue.marks.flat().length} 处问题)
                 </Text>
               )}
             </Text>
@@ -264,7 +266,7 @@ const IssueDetailPage: React.FC = () => {
                   <View key={idx} className={styles.photoItem}>
                     <MarkedImageView
                       imageUrl={img}
-                      marks={issue.marks || []}
+                      marks={issue.marks[idx] || []}
                       width={200}
                       height={200}
                       mode="aspectFill"

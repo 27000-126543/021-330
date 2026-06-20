@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, Canvas } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import classnames from 'classnames';
@@ -20,14 +20,15 @@ const TOOLS = [
 ];
 
 const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, initialMarks = [] }) => {
-  const [marks, setMarks] = useState<IssueMark[]>(initialMarks);
+  const [marks, setMarks] = useState<IssueMark[]>([]);
   const [currentTool, setCurrentTool] = useState<string>('freehand');
   const [currentColor, setCurrentColor] = useState(COLORS[0]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentPoints, setCurrentPoints] = useState<MarkPoint[]>([]);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
+  const [imgDisplaySize, setImgDisplaySize] = useState({ width: 0, height: 0 });
+  const [imgNaturalSize, setImgNaturalSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const query = Taro.createSelectorQuery();
@@ -41,6 +42,8 @@ const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, i
         Taro.getImageInfo({
           src: imageUrl,
           success: (imgRes) => {
+            setImgNaturalSize({ width: imgRes.width, height: imgRes.height });
+
             const imgRatio = imgRes.width / imgRes.height;
             let displayWidth = maxWidth;
             let displayHeight = maxWidth / imgRatio;
@@ -50,13 +53,13 @@ const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, i
               displayWidth = maxHeight * imgRatio;
             }
 
-            setImgSize({ width: displayWidth, height: displayHeight });
-            setCanvasSize({ width: displayWidth, height: displayHeight });
+            setImgDisplaySize({ width: displayWidth, height: displayHeight });
             setImageLoaded(true);
           },
           fail: (err) => {
             console.error('[ImageMarker] getImageInfo error:', err);
-            setCanvasSize({ width: maxWidth, height: maxWidth * 0.75 });
+            setImgDisplaySize({ width: maxWidth, height: maxWidth * 0.75 });
+            setImgNaturalSize({ width: maxWidth, height: maxWidth * 0.75 });
             setImageLoaded(true);
           }
         });
@@ -64,11 +67,45 @@ const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, i
     });
   }, [imageUrl]);
 
+  const percentToPixel = useCallback((pctPoint: MarkPoint): MarkPoint => {
+    return {
+      x: (pctPoint.x / 100) * imgDisplaySize.width,
+      y: (pctPoint.y / 100) * imgDisplaySize.height
+    };
+  }, [imgDisplaySize]);
+
+  const pixelToPercent = useCallback((pixelPoint: MarkPoint): MarkPoint => {
+    if (imgDisplaySize.width === 0 || imgDisplaySize.height === 0) {
+      return { x: 0, y: 0 };
+    }
+    return {
+      x: (pixelPoint.x / imgDisplaySize.width) * 100,
+      y: (pixelPoint.y / imgDisplaySize.height) * 100
+    };
+  }, [imgDisplaySize]);
+
+  const displayMarks = useMemo(() => {
+    return marks.map(mark => ({
+      ...mark,
+      points: mark.points.map(p => percentToPixel(p))
+    }));
+  }, [marks, percentToPixel]);
+
+  const displayCurrentPoints = useMemo(() => {
+    return currentPoints.map(p => percentToPixel(p));
+  }, [currentPoints, percentToPixel]);
+
+  useEffect(() => {
+    if (imageLoaded && initialMarks.length > 0 && marks.length === 0) {
+      setMarks(initialMarks);
+    }
+  }, [imageLoaded, initialMarks, marks.length]);
+
   useEffect(() => {
     if (imageLoaded && canvasSize.width > 0) {
       redrawCanvas();
     }
-  }, [marks, imageLoaded, canvasSize, currentPoints]);
+  }, [displayMarks, imageLoaded, canvasSize, displayCurrentPoints]);
 
   const redrawCanvas = useCallback(() => {
     const query = Taro.createSelectorQuery();
@@ -86,25 +123,28 @@ const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, i
 
       ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
 
+      const offsetX = (canvasSize.width - imgDisplaySize.width) / 2;
+      const offsetY = (canvasSize.height - imgDisplaySize.height) / 2;
+
       const img = canvas.createImage();
       img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvasSize.width, canvasSize.height);
-        drawAllMarks(ctx);
-        drawCurrentPath(ctx);
+        ctx.drawImage(img, offsetX, offsetY, imgDisplaySize.width, imgDisplaySize.height);
+        drawAllMarks(ctx, offsetX, offsetY);
+        drawCurrentPath(ctx, offsetX, offsetY);
       };
       img.onerror = () => {
         console.error('[ImageMarker] image load error');
         ctx.fillStyle = '#f0f0f0';
-        ctx.fillRect(0, 0, canvasSize.width, canvasSize.height);
-        drawAllMarks(ctx);
-        drawCurrentPath(ctx);
+        ctx.fillRect(offsetX, offsetY, imgDisplaySize.width, imgDisplaySize.height);
+        drawAllMarks(ctx, offsetX, offsetY);
+        drawCurrentPath(ctx, offsetX, offsetY);
       };
       img.src = imageUrl;
     });
-  }, [canvasSize, imageUrl, marks, currentPoints]);
+  }, [canvasSize, imageUrl, displayMarks, displayCurrentPoints, imgDisplaySize]);
 
-  const drawAllMarks = (ctx: any) => {
-    marks.forEach(mark => {
+  const drawAllMarks = (ctx: any, offsetX: number, offsetY: number) => {
+    displayMarks.forEach(mark => {
       ctx.strokeStyle = mark.color;
       ctx.lineWidth = 4;
       ctx.lineCap = 'round';
@@ -115,51 +155,51 @@ const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, i
         const p2 = mark.points[1];
         const radius = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
         ctx.beginPath();
-        ctx.arc(p1.x, p1.y, radius, 0, Math.PI * 2);
+        ctx.arc(p1.x + offsetX, p1.y + offsetY, radius, 0, Math.PI * 2);
         ctx.stroke();
       } else if (mark.type === 'rect' && mark.points.length >= 2) {
         const p1 = mark.points[0];
         const p2 = mark.points[1];
         ctx.beginPath();
-        ctx.strokeRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+        ctx.strokeRect(p1.x + offsetX, p1.y + offsetY, p2.x - p1.x, p2.y - p1.y);
         ctx.stroke();
       } else if (mark.points.length > 1) {
         ctx.beginPath();
-        ctx.moveTo(mark.points[0].x, mark.points[0].y);
+        ctx.moveTo(mark.points[0].x + offsetX, mark.points[0].y + offsetY);
         for (let i = 1; i < mark.points.length; i++) {
-          ctx.lineTo(mark.points[i].x, mark.points[i].y);
+          ctx.lineTo(mark.points[i].x + offsetX, mark.points[i].y + offsetY);
         }
         ctx.stroke();
       }
     });
   };
 
-  const drawCurrentPath = (ctx: any) => {
-    if (currentPoints.length < 1) return;
+  const drawCurrentPath = (ctx: any, offsetX: number, offsetY: number) => {
+    if (displayCurrentPoints.length < 1) return;
 
     ctx.strokeStyle = currentColor;
     ctx.lineWidth = 4;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    if (currentTool === 'circle' && currentPoints.length >= 2) {
-      const p1 = currentPoints[0];
-      const p2 = currentPoints[currentPoints.length - 1];
+    if (currentTool === 'circle' && displayCurrentPoints.length >= 2) {
+      const p1 = displayCurrentPoints[0];
+      const p2 = displayCurrentPoints[displayCurrentPoints.length - 1];
       const radius = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
       ctx.beginPath();
-      ctx.arc(p1.x, p1.y, radius, 0, Math.PI * 2);
+      ctx.arc(p1.x + offsetX, p1.y + offsetY, radius, 0, Math.PI * 2);
       ctx.stroke();
-    } else if (currentTool === 'rect' && currentPoints.length >= 2) {
-      const p1 = currentPoints[0];
-      const p2 = currentPoints[currentPoints.length - 1];
+    } else if (currentTool === 'rect' && displayCurrentPoints.length >= 2) {
+      const p1 = displayCurrentPoints[0];
+      const p2 = displayCurrentPoints[displayCurrentPoints.length - 1];
       ctx.beginPath();
-      ctx.strokeRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+      ctx.strokeRect(p1.x + offsetX, p1.y + offsetY, p2.x - p1.x, p2.y - p1.y);
       ctx.stroke();
-    } else if (currentTool === 'freehand' && currentPoints.length > 1) {
+    } else if (currentTool === 'freehand' && displayCurrentPoints.length > 1) {
       ctx.beginPath();
-      ctx.moveTo(currentPoints[0].x, currentPoints[0].y);
-      for (let i = 1; i < currentPoints.length; i++) {
-        ctx.lineTo(currentPoints[i].x, currentPoints[i].y);
+      ctx.moveTo(displayCurrentPoints[0].x + offsetX, displayCurrentPoints[0].y + offsetY);
+      for (let i = 1; i < displayCurrentPoints.length; i++) {
+        ctx.lineTo(displayCurrentPoints[i].x + offsetX, displayCurrentPoints[i].y + offsetY);
       }
       ctx.stroke();
     }
@@ -180,14 +220,19 @@ const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, i
       query.exec((res) => {
         if (res && res[0]) {
           const rect = res[0];
-          const x = touch.clientX - rect.left;
-          const y = touch.clientY - rect.top;
-          resolve({
-            x: Math.max(0, Math.min(x, canvasSize.width)),
-            y: Math.max(0, Math.min(y, canvasSize.height))
-          });
+          const offsetX = (canvasSize.width - imgDisplaySize.width) / 2;
+          const offsetY = (canvasSize.height - imgDisplaySize.height) / 2;
+
+          let x = touch.clientX - rect.left - offsetX;
+          let y = touch.clientY - rect.top - offsetY;
+
+          x = Math.max(0, Math.min(x, imgDisplaySize.width));
+          y = Math.max(0, Math.min(y, imgDisplaySize.height));
+
+          const pctPoint = pixelToPercent({ x, y });
+          resolve(pctPoint);
         } else {
-          resolve({ x: touch.clientX, y: touch.clientY });
+          resolve({ x: 0, y: 0 });
         }
       });
     });
@@ -212,7 +257,7 @@ const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, i
     if (currentTool === 'freehand') {
       setCurrentPoints(prev => [...prev, pos]);
     } else {
-      setCurrentPoints([currentPoints[0], pos]);
+      setCurrentPoints(prev => [prev[0], pos]);
     }
   };
 
@@ -220,30 +265,28 @@ const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, i
     if (!isDrawing) return;
     setIsDrawing(false);
 
-    let points = currentPoints;
-    if (points.length < 2) {
+    if (currentPoints.length < 2) {
       setCurrentPoints([]);
       return;
     }
 
-    let markType: 'circle' | 'rect' | 'text' = 'circle';
-    if (currentTool === 'rect') {
+    let markType: 'circle' | 'rect' | 'text' = 'freehand' as any;
+    if (currentTool === 'circle') {
+      markType = 'circle';
+    } else if (currentTool === 'rect') {
       markType = 'rect';
     } else if (currentTool === 'freehand') {
       markType = 'circle';
     }
 
-    if (currentTool === 'freehand' || currentTool === 'circle' || currentTool === 'rect') {
-      const newMark: IssueMark = {
-        id: `mark_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        type: markType,
-        points: points,
-        color: currentColor
-      };
+    const newMark: IssueMark = {
+      id: `mark_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      type: markType,
+      points: currentPoints,
+      color: currentColor
+    };
 
-      setMarks(prev => [...prev, newMark]);
-    }
-
+    setMarks(prev => [...prev, newMark]);
     setCurrentPoints([]);
   };
 
@@ -299,7 +342,6 @@ const ImageMarker: React.FC<ImageMarkerProps> = ({ imageUrl, onSave, onCancel, i
               <Canvas
                 id="markCanvas"
                 type="2d"
-                ref={canvasRef}
                 style={{ width: canvasSize.width + 'px', height: canvasSize.height + 'px' }}
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}

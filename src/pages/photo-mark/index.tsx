@@ -71,41 +71,21 @@ const PhotoMarkPage: React.FC = () => {
 
   const handleSaveMarks = useCallback((marks: IssueMark[]) => {
     if (markingImageIndex !== null) {
-      Taro.getImageInfo({
-        src: images[markingImageIndex],
-        success: (imgRes) => {
-          const scaledMarks = marks.map(mark => ({
-            ...mark,
-            points: mark.points.map(p => ({
-              x: (p.x / imgRes.width) * 100,
-              y: (p.y / imgRes.height) * 100
-            }))
-          }));
+      setImageMarks(prev => {
+        const updated = [...prev];
+        updated[markingImageIndex] = marks;
+        return updated;
+      });
+      console.log('[PhotoMark] marks saved for image', markingImageIndex, ':', marks.length);
 
-          setImageMarks(prev => {
-            const updated = [...prev];
-            updated[markingImageIndex] = scaledMarks;
-            return updated;
-          });
-          console.log('[PhotoMark] marks saved for image', markingImageIndex, ':', scaledMarks.length);
-
-          Taro.showToast({
-            title: `已保存${scaledMarks.length}处标注`,
-            icon: 'success',
-            duration: 1000
-          });
-        },
-        fail: () => {
-          setImageMarks(prev => {
-            const updated = [...prev];
-            updated[markingImageIndex] = marks;
-            return updated;
-          });
-        }
+      Taro.showToast({
+        title: `已保存${marks.length}处标注`,
+        icon: 'success',
+        duration: 1000
       });
     }
     setMarkingImageIndex(null);
-  }, [markingImageIndex, images]);
+  }, [markingImageIndex]);
 
   const handleCancelMark = useCallback(() => {
     setMarkingImageIndex(null);
@@ -189,7 +169,7 @@ const PhotoMarkPage: React.FC = () => {
       ? calculatedDeviation <= allow
       : undefined;
 
-    const allMarks = imageMarks.flat();
+    const issueMarks = images.map((_, idx) => imageMarks[idx] || []);
 
     const newIssue: Issue = {
       id: `i${Date.now()}`,
@@ -206,7 +186,7 @@ const PhotoMarkPage: React.FC = () => {
       deviation: calculatedDeviation,
       isQualified: calculatedQualified,
       images: images,
-      marks: allMarks,
+      marks: issueMarks,
       rectifyImages: [],
       records: [
         {
@@ -225,7 +205,8 @@ const PhotoMarkPage: React.FC = () => {
     };
 
     addIssue(newIssue);
-    console.log('[PhotoMark] issue submitted:', newIssue.id, 'marks:', allMarks.length);
+    const totalMarks = issueMarks.flat().length;
+    console.log('[PhotoMark] issue submitted:', newIssue.id, 'total marks:', totalMarks);
 
     Taro.showToast({
       title: '提交成功',

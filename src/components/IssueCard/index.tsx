@@ -23,6 +23,9 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick }) => {
     }
   };
 
+  const firstImageMarks = issue.marks && issue.marks.length > 0 ? issue.marks[0] : [];
+  const totalMarkCount = issue.marks ? issue.marks.flat().length : 0;
+
   const hasElevationData = issue.designElevation !== undefined &&
                           issue.measuredElevation !== undefined &&
                           issue.allowableDeviation !== undefined;
@@ -42,14 +45,14 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick }) => {
           <View className={styles.imageWrapper}>
             <MarkedImageView
               imageUrl={issue.images[0]}
-              marks={issue.marks || []}
+              marks={firstImageMarks}
               width={180}
               height={180}
               mode="aspectFill"
             />
-            {issue.marks && issue.marks.length > 0 && (
+            {totalMarkCount > 0 && (
               <View className={styles.markIndicator}>
-                <Text className={styles.markIndicatorText}>{issue.marks.length}</Text>
+                <Text className={styles.markIndicatorText}>{totalMarkCount}</Text>
               </View>
             )}
           </View>

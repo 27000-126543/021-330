@@ -16,7 +16,7 @@ export const mockIssues: Issue[] = [
     deviation: 150,
     isQualified: false,
     images: ['https://picsum.photos/id/1033/600/800'],
-    marks: [],
+    marks: [[]],
     rectifyImages: [],
     records: [
       {
@@ -43,7 +43,7 @@ export const mockIssues: Issue[] = [
     description: '桥架贴梁过近，检修空间不足',
     status: 'processing',
     images: ['https://picsum.photos/id/1034/600/800'],
-    marks: [],
+    marks: [[]],
     rectifyImages: ['https://picsum.photos/id/1035/600/800'],
     rectifyMethod: 'hanger_adjust',
     rectifyDescription: '支吊架下调50mm，增加检修空间',
@@ -87,7 +87,7 @@ export const mockIssues: Issue[] = [
     deviation: 50,
     isQualified: false,
     images: ['https://picsum.photos/id/1036/600/800'],
-    marks: [],
+    marks: [[]],
     rectifyImages: ['https://picsum.photos/id/1037/600/800'],
     rectifyMethod: 'pipe_move',
     rectifyDescription: '调整喷淋支管高度至设计标高',
@@ -136,7 +136,7 @@ export const mockIssues: Issue[] = [
     description: '风管与水管间距不足，检修空间不够',
     status: 'rejected',
     images: ['https://picsum.photos/id/1038/600/800'],
-    marks: [],
+    marks: [[]],
     rectifyImages: ['https://picsum.photos/id/1039/600/800'],
     rectifyMethod: 'other',
     rectifyDescription: '已调整风管位置',
@@ -185,7 +185,7 @@ export const mockIssues: Issue[] = [
     description: '桥架支吊架间距超标，需设计确认是否可以调整',
     status: 'design',
     images: ['https://picsum.photos/id/1040/600/800'],
-    marks: [],
+    marks: [[]],
     rectifyImages: [],
     records: [
       {
@@ -222,7 +222,7 @@ export const mockIssues: Issue[] = [
     description: '喷淋主管偏位，与风管交叉',
     status: 'pending',
     images: ['https://picsum.photos/id/1041/600/800'],
-    marks: [],
+    marks: [[]],
     rectifyImages: [],
     records: [
       {
@@ -249,7 +249,7 @@ export const mockIssues: Issue[] = [
     description: '排烟管贴梁底安装，保温层厚度不足',
     status: 'processing',
     images: ['https://picsum.photos/id/1042/600/800'],
-    marks: [],
+    marks: [[]],
     rectifyImages: ['https://picsum.photos/id/1043/600/800'],
     rectifyMethod: 'insulation_adjust',
     rectifyDescription: '已调整保温层厚度至设计要求',
