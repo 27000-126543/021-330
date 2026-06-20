@@ -1,0 +1,62 @@
+@use '@/styles/variables.scss' as *;
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-sm;
+  padding: 0 $spacing-sm;
+  white-space: nowrap;
+
+  &.size-sm {
+    height: 40rpx;
+    min-width: 64rpx;
+  }
+
+  &.size-md {
+    height: 48rpx;
+    min-width: 80rpx;
+    padding: 0 $spacing-md;
+  }
+}
+
+.tagText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: 1;
+}
+
+.status-pending {
+  background: $color-pending-bg;
+  .tagText {
+    color: $color-pending;
+  }
+}
+
+.status-processing {
+  background: $color-processing-bg;
+  .tagText {
+    color: $color-processing;
+  }
+}
+
+.status-done {
+  background: $color-done-bg;
+  .tagText {
+    color: $color-done;
+  }
+}
+
+.status-rejected {
+  background: $color-rejected-bg;
+  .tagText {
+    color: $color-rejected;
+  }
+}
+
+.status-design {
+  background: $color-design-bg;
+  .tagText {
+    color: $color-design;
+  }
+}

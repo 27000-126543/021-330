@@ -1,0 +1,391 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 180rpx;
+}
+
+.statsBar {
+  display: flex;
+  background: $color-bg-card;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.statItem {
+  flex: 1;
+  text-align: center;
+
+  & + & {
+    border-left: 1rpx solid $color-divider;
+  }
+}
+
+.statValue {
+  display: block;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  margin-bottom: 4rpx;
+
+  &.total {
+    color: $color-primary;
+  }
+
+  &.pass {
+    color: $color-success;
+  }
+
+  &.fail {
+    color: $color-error;
+  }
+}
+
+.statLabel {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $page-padding;
+  background: $color-bg-card;
+  margin-bottom: $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.typeFilter {
+  display: flex;
+  gap: $spacing-sm;
+  flex: 1;
+}
+
+.filterTag {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  background: $color-bg-page;
+  white-space: nowrap;
+
+  &.active {
+    background: $color-primary-bg;
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.listContainer {
+  padding: 0 $page-padding;
+}
+
+.recordCard {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  box-shadow: $shadow-card;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.typeBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40rpx;
+  padding: 0 $spacing-sm;
+  background: $color-primary-bg;
+  color: $color-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-sm;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40rpx;
+  padding: 0 $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  &.pass {
+    background: $color-success-bg;
+    color: $color-success;
+  }
+
+  &.fail {
+    background: $color-error-bg;
+    color: $color-error;
+  }
+}
+
+.axisText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.projectText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-md;
+}
+
+.elevationGrid {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-md;
+}
+
+.elevItem {
+  flex: 1;
+  text-align: center;
+}
+
+.elevLabel {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 6rpx;
+}
+
+.elevValue {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+
+  &.deviation {
+    color: $color-error;
+
+    &.pass {
+      color: $color-success;
+    }
+  }
+}
+
+.elevUnit {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-normal;
+  color: $color-text-tertiary;
+}
+
+.remarkText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.5;
+  margin-bottom: $spacing-sm;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: $spacing-sm;
+  border-top: 1rpx solid $color-divider;
+}
+
+.timeText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.fabButton {
+  position: fixed;
+  right: $page-padding;
+  bottom: 120rpx;
+  width: 104rpx;
+  height: 104rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(22, 93, 255, 0.4);
+  z-index: 100;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+.fabIcon {
+  font-size: 48rpx;
+  color: #fff;
+  line-height: 1;
+}
+
+.addModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modalContent {
+  width: 100%;
+  max-height: 85vh;
+  background: $color-bg-card;
+  border-radius: $radius-xl $radius-xl 0 0;
+  padding: $spacing-lg;
+  padding-bottom: calc(#{$spacing-lg} + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.modalClose {
+  font-size: 40rpx;
+  color: $color-text-tertiary;
+  padding: $spacing-xs;
+}
+
+.modalFormItem {
+  margin-bottom: $spacing-lg;
+}
+
+.modalLabel {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.modalInput {
+  width: 100%;
+  height: 80rpx;
+  background: $color-bg-input;
+  border-radius: $radius-sm;
+  padding: 0 $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  box-sizing: border-box;
+}
+
+.modalTextarea {
+  width: 100%;
+  height: 120rpx;
+  background: $color-bg-input;
+  border-radius: $radius-sm;
+  padding: $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+
+.typeSelector {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.typeOption {
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+
+  &.active {
+    background: $color-primary-bg;
+    color: $color-primary;
+    border-color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.elevInputGroup {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.elevInputItem {
+  flex: 1;
+}
+
+.modalSubmit {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  margin-top: $spacing-lg;
+  box-shadow: 0 4rpx 16rpx rgba(22, 93, 255, 0.3);
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.deviationPreview {
+  padding: $spacing-md;
+  border-radius: $radius-sm;
+  text-align: center;
+  margin-top: $spacing-md;
+
+  &.pass {
+    background: $color-success-bg;
+  }
+
+  &.fail {
+    background: $color-error-bg;
+  }
+}
+
+.deviationPreviewText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+
+  &.pass {
+    color: $color-success;
+  }
+
+  &.fail {
+    color: $color-error;
+  }
+}

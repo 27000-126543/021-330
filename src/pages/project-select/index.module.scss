@@ -1,0 +1,107 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding: $spacing-md $page-padding;
+}
+
+.searchBar {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: 0 $spacing-md;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.searchIcon {
+  font-size: 32rpx;
+  color: $color-text-tertiary;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  height: 100%;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.projectList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.projectCard {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  position: relative;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &.selected {
+    border: 2rpx solid $color-primary;
+    background: $color-primary-bg;
+  }
+}
+
+.projectName {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis;
+}
+
+.projectAddress {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xs;
+  @include text-ellipsis;
+}
+
+.projectInfo {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1rpx solid $color-divider;
+}
+
+.infoItem {
+  flex: 1;
+}
+
+.infoLabel {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.infoValue {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.selectedIcon {
+  position: absolute;
+  top: $spacing-md;
+  right: $spacing-md;
+  font-size: 36rpx;
+  color: $color-primary;
+}

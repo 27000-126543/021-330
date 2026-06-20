@@ -1,0 +1,343 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 180rpx;
+}
+
+.statusHeader {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-lg $page-padding;
+  color: #fff;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44rpx;
+  padding: 0 $spacing-md;
+  border-radius: $radius-button;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.issueTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-xs;
+}
+
+.issueSubtitle {
+  font-size: $font-size-sm;
+  opacity: 0.9;
+}
+
+.infoSection {
+  background: $color-bg-card;
+  margin: $spacing-md 0;
+  padding: $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6rpx;
+    height: 28rpx;
+    background: $color-primary;
+    border-radius: 3rpx;
+    margin-right: $spacing-sm;
+  }
+}
+
+.infoGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.infoItem {
+  width: calc(50% - #{$spacing-md} / 2);
+}
+
+.infoLabel {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: 6rpx;
+}
+
+.infoValue {
+  display: block;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  word-break: break-all;
+}
+
+.elevationCard {
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  padding: $spacing-md;
+  margin-top: $spacing-md;
+}
+
+.elevRow {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.elevCol {
+  flex: 1;
+  text-align: center;
+  background: $color-bg-card;
+  border-radius: $radius-sm;
+  padding: $spacing-sm 0;
+}
+
+.elevColLabel {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.elevColValue {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+
+  &.deviation {
+    color: $color-error;
+
+    &.pass {
+      color: $color-success;
+    }
+  }
+}
+
+.photoSection {
+  background: $color-bg-card;
+  margin: $spacing-md 0;
+  padding: $spacing-lg;
+}
+
+.photoGroup {
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.photoLabel {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  font-weight: $font-weight-medium;
+}
+
+.photoList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.photoItem {
+  width: calc(33.333% - #{$spacing-sm} * 2 / 3);
+  aspect-ratio: 1;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  background: $color-bg-page;
+}
+
+.photoImg {
+  width: 100%;
+  height: 100%;
+}
+
+.emptyPhotos {
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+}
+
+.description {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: 1.6;
+}
+
+.recordList {
+  position: relative;
+  padding-left: $spacing-lg;
+}
+
+.recordItem {
+  position: relative;
+  padding-bottom: $spacing-lg;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -$spacing-lg;
+    top: 8rpx;
+    width: 2rpx;
+    height: calc(100% - 16rpx);
+    background: $color-divider;
+  }
+
+  &:last-child::before {
+    display: none;
+  }
+}
+
+.recordDot {
+  position: absolute;
+  left: -$spacing-lg;
+  top: 0;
+  transform: translateX(calc(-50% + 1rpx));
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: $color-primary;
+  border: 4rpx solid $color-bg-card;
+  box-shadow: 0 0 0 2rpx $color-primary;
+  z-index: 1;
+}
+
+.recordHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+}
+
+.recordAction {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.recordTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.recordOperator {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xs;
+}
+
+.recordDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.5;
+}
+
+.recordPhotos {
+  display: flex;
+  gap: $spacing-xs;
+  margin-top: $spacing-sm;
+}
+
+.recordPhoto {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: $radius-xs;
+  overflow: hidden;
+}
+
+.actionBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  background: $color-bg-card;
+  border-top: 1rpx solid $color-divider;
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.actionBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  &.primary {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+    color: #fff;
+    box-shadow: 0 4rpx 16rpx rgba(22, 93, 255, 0.3);
+  }
+
+  &.success {
+    background: $color-success;
+    color: #fff;
+  }
+
+  &.danger {
+    background: $color-error;
+    color: #fff;
+  }
+
+  &.secondary {
+    background: $color-bg-page;
+    color: $color-text-secondary;
+  }
+}
+
+.methodTag {
+  display: inline-block;
+  padding: 4rpx $spacing-sm;
+  background: $color-primary-bg;
+  color: $color-primary;
+  font-size: $font-size-xs;
+  border-radius: $radius-xs;
+  margin-right: $spacing-xs;
+}

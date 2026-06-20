@@ -1,0 +1,250 @@
+@use '@/styles/variables.scss' as *;
+
+.pageContainer {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 180rpx;
+}
+
+.issueCard {
+  background: $color-bg-card;
+  margin: $spacing-md;
+  padding: $spacing-lg;
+  border-radius: $radius-md;
+  box-shadow: $shadow-card;
+}
+
+.issueTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.issueMeta {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.5;
+}
+
+.section {
+  background: $color-bg-card;
+  margin: $spacing-md;
+  padding: $spacing-lg;
+  border-radius: $radius-md;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6rpx;
+    height: 28rpx;
+    background: $color-primary;
+    border-radius: 3rpx;
+    margin-right: $spacing-sm;
+  }
+}
+
+.formItem {
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.formLabel {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.methodList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.methodItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  border: 2rpx solid transparent;
+  transition: all $transition-fast;
+
+  &.active {
+    background: $color-primary-bg;
+    border-color: $color-primary;
+  }
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.methodRadio {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  border: 2rpx solid $color-border;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+
+  .active & {
+    border-color: $color-primary;
+  }
+}
+
+.methodRadioInner {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: $color-primary;
+  display: none;
+
+  .active & {
+    display: block;
+  }
+}
+
+.methodText {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+
+  .active & {
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.photoArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 240rpx;
+  border: 2rpx dashed $color-border;
+  border-radius: $radius-md;
+  background: $color-bg-input;
+  padding: $spacing-lg;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.photoIcon {
+  font-size: 56rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.photoText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.photoTip {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.photoPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+.photoItem {
+  position: relative;
+  width: calc(33.333% - #{$spacing-sm} * 2 / 3);
+  aspect-ratio: 1;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.photoImg {
+  width: 100%;
+  height: 100%;
+}
+
+.photoDelete {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 28rpx;
+  line-height: 1;
+}
+
+.textarea {
+  width: 100%;
+  height: 200rpx;
+  background: $color-bg-input;
+  border-radius: $radius-sm;
+  padding: $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+
+.submitBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  background: $color-bg-card;
+  border-top: 1rpx solid $color-divider;
+  z-index: 100;
+}
+
+.submitBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  color: #fff;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  box-shadow: 0 4rpx 16rpx rgba(22, 93, 255, 0.3);
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+
+  &.disabled {
+    background: $color-text-disabled;
+    box-shadow: none;
+  }
+}
